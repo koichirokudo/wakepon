@@ -26,8 +26,7 @@ USING (
 
 CREATE POLICY "Users can insert expenses in their households"
 ON expenses 
-FOR INSERT 
-USING (
+WITH CHECK (
     EXISTS (
         SELECT 1 FROM household_members
         WHERE household_id = expenses.household_id
