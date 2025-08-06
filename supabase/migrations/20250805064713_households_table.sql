@@ -7,5 +7,5 @@ CREATE TABLE households(
 
 ALTER TABLE households ENABLE ROW LEVEL SECURITY;
 
-create policy "Users can view their own profile and group." on households
-    for select using (true);
+CREATE POLICY "Users can view their own profile and group." ON households
+    FOR SELECT USING (true);

@@ -7,11 +7,31 @@ CREATE TABLE users (
 
 ALTER TABLE users ENABLE ROW LEVEL SECURITY;
 
-create policy "Users can view their own profile and group." on users
-    for select using (true);
+CREATE POLICY "Users can view their own profile and group." ON users
+    FOR SELECT USING (true);
 
-create policy "Users can insert their own profile." on users
-    for insert with check ((select auth.uid()) = users.id);
+CREATE POLICY "Users can insert their own profile." ON users
+    FOR INSERT WITH CHECK ((SELECT auth.uid()) = users.id);
 
-create policy "Users can update own profile." on users 
-    for update using ((select auth.uid()) = users.id);
+CREATE POLICY "Users can update own profile." ON users 
+    FOR UPDATE USING ((SELECT auth.uid()) = users.id);
+
+-- ユーザー作成時に users テーブルにデータを挿入する
+CREATE OR REPLACE FUNCTION public.handle_new_user()
+RETURNS TRIGGER AS $$
+DECLARE
+    user_name TEXT;
+    BEGIN
+        -- nameが存在しない場合はemailの@より前の部分を使用する
+        user_name := COALESCE(NEW.raw_user_meta_data->>'name', split_part(NEW.email, '@', 1));
+        
+        -- public.users にコピーする
+        INSERT INTO public.users (id, name, created_at,updated_at) VALUES (NEW.id, user_name, now(), now());
+        RETURN NEW;
+    END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- ユーザー作成時に handle_new_user 関数を実行するためのトリガーを定義
+CREATE TRIGGER on_auth_user_created
+    AFTER INSERT ON auth.users
+    FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
