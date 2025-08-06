@@ -8,7 +8,7 @@ type User = {
   password: string;
 };
 
-export default function SingUp() {
+export default function SignUp() {
   const [user, setUser] = useState<User>({ name: '', email: '', password: '' });
   const [message, setMessage] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
