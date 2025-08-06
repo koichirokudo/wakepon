@@ -38,9 +38,9 @@ export default function SignIn() {
     <div>
       <h1>ログイン</h1>
       <form onSubmit={(e) => e.preventDefault()}>
-        <input type="email" placeholder="メールアドレス" value={user.email} onChange={(e) => setUser({ ...user, email: e.target.value })} required />
-        <input type="password" placeholder="パスワード" value={user.password} onChange={(e) => setUser({ ...user, password: e.target.value })} required />
-        <input type="button" value="ログインする" onClick={handleSignIn} />
+        <input type="email" placeholder="メールアドレス" value={user.email} onChange={(e) => setUser({ ...user, email: e.target.value })} required /><br />
+        <input type="password" placeholder="パスワード" value={user.password} onChange={(e) => setUser({ ...user, password: e.target.value })} required /><br />
+        <input type="button" value="ログインする" onClick={handleSignIn} /><br />
         {isLoading && <p>ログイン中...</p>}
         {message && <p>{message}</p>}
       </form>

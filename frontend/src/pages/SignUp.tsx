@@ -30,7 +30,7 @@ export default function SignUp() {
 
       if (error) {
         setMessage(error.message);
-      }    
+      }
 
       if (data && data.user) {
         setMessage('ユーザー登録が完了しました');
@@ -49,9 +49,10 @@ export default function SignUp() {
     <div>
       <h1>ユーザー登録</h1>
       <form onSubmit={handleSignUp}>
-        <input type="text" placeholder="名前" value={user.name} onChange={(e) => setUser({ ...user, name: e.target.value })} required />
-        <input type="email" placeholder="メールアドレス" value={user.email} onChange={(e) => setUser({ ...user, email: e.target.value })} required  />
-        <input type="password" placeholder="パスワード" value={user.password} onChange={(e) => setUser({ ...user, password: e.target.value })} required  />
+        <input type="text" placeholder="名前" value={user.name} onChange={(e) => setUser({ ...user, name: e.target.value })} required /><br />
+        <input type="email" placeholder="メールアドレス" value={user.email} onChange={(e) => setUser({ ...user, email: e.target.value })} required /><br />
+        <input type="password" placeholder="パスワード" value={user.password} onChange={(e) => setUser({ ...user, password: e.target.value })} required /><br />
+        <br />
         <input type="button" value="登録する" onClick={handleSignUp} />
         {isLoading && <p>登録中...</p>}
         {message && <p>{message}</p>}
