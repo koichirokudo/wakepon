@@ -1,4 +1,4 @@
-// src/pages/UserRegister.tsx
+// src/pages/SignUp.tsx
 import { useState } from 'react';
 import { supabase } from '../lib/supabaseClient';
 
@@ -17,7 +17,6 @@ export default function SingUp() {
     setIsLoading(true);
     setMessage('');
 
-    console.log(user);
     try {
       const { data, error } = await supabase.auth.signUp({
         email: user.email,
@@ -28,11 +27,11 @@ export default function SingUp() {
           },
         },
       });
-      console.log(data);
-      console.log(error);
+
       if (error) {
         setMessage(error.message);
       }    
+
       if (data && data.user) {
         setMessage('ユーザー登録が完了しました');
       } else {
@@ -50,9 +49,9 @@ export default function SingUp() {
     <div>
       <h1>ユーザー登録</h1>
       <form onSubmit={handleSignUp}>
-        <input type="text" placeholder="名前" value={user.name} onChange={(e) => setUser({ ...user, name: e.target.value })} />
-        <input type="email" placeholder="メールアドレス" value={user.email} onChange={(e) => setUser({ ...user, email: e.target.value })} />
-        <input type="password" placeholder="パスワード" value={user.password} onChange={(e) => setUser({ ...user, password: e.target.value })} />
+        <input type="text" placeholder="名前" value={user.name} onChange={(e) => setUser({ ...user, name: e.target.value })} required />
+        <input type="email" placeholder="メールアドレス" value={user.email} onChange={(e) => setUser({ ...user, email: e.target.value })} required  />
+        <input type="password" placeholder="パスワード" value={user.password} onChange={(e) => setUser({ ...user, password: e.target.value })} required  />
         <input type="button" value="登録する" onClick={handleSignUp} />
         {isLoading && <p>登録中...</p>}
         {message && <p>{message}</p>}
