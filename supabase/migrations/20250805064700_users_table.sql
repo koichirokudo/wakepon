@@ -16,6 +16,7 @@ CREATE POLICY "Users can insert their own profile." ON users
 CREATE POLICY "Users can update own profile." ON users 
     FOR UPDATE USING ((SELECT auth.uid()) = users.id);
 
+-- supabase では auth.users テーブルにユーザー情報が保存される
 -- ユーザー作成時に users テーブルにデータを挿入する
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS TRIGGER AS $$
