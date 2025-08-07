@@ -6,7 +6,7 @@ type AuthContextType = {
   userId: string | null;
   email: string | null;
   householdId: string | null;
-  name: string | null;
+  userName: string | null;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -15,7 +15,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [userId, setUserId] = useState<string | null>(null);
   const [email, setEmail] = useState<string | null>(null);
   const [householdId, setHouseholdId] = useState<string | null>(null);
-  const [name, setName] = useState<string | null>(null);
+  const [userName, setUserName] = useState<string | null>(null);
 
   useEffect(() => {
     // 認証情報の取得
@@ -46,7 +46,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           .limit(1)
           .maybeSingle();
         if (userData) {
-          setName(userData.name);
+          setUserName(userData.name);
         }
       }
     };
@@ -55,7 +55,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ userId, email, householdId, name }}>
+    <AuthContext.Provider value={{ userId, email, householdId, userName }}>
       {children}
     </AuthContext.Provider>
   );
