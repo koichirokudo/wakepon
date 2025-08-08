@@ -1,6 +1,7 @@
 // src/pages/SignUp.tsx
 import { useState } from 'react';
 import { supabase } from '../lib/supabaseClient';
+import { useSearchParams } from 'react-router-dom';
 
 type User = {
   name: string;
@@ -12,13 +13,15 @@ export default function SignUp() {
   const [user, setUser] = useState<User>({ name: '', email: '', password: '' });
   const [message, setMessage] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [searchParams] = useSearchParams();
+  const inviteCode = searchParams.get('invite_code');
 
   const handleSignUp = async () => {
     setIsLoading(true);
     setMessage('');
 
     try {
-      const { data, error } = await supabase.auth.signUp({
+      const { data: authData, error: authError } = await supabase.auth.signUp({
         email: user.email,
         password: user.password,
         options: {
@@ -28,11 +31,39 @@ export default function SignUp() {
         },
       });
 
-      if (error) {
-        setMessage(error.message);
+      if (authError) {
+        setMessage(authError.message);
       }
 
-      if (data && data.user) {
+      if (authData?.user) {
+        // ユーザー登録後の処理
+        if (inviteCode) {
+          // RPC を使用して招待コードを処理
+          // 招待コードがある場合は、招待コードを使用してグループに参加
+          const { error } = await supabase.rpc('use_invite_code', {
+            p_user_id: authData.user.id,
+            p_invite_code: inviteCode,
+          });
+
+          if (error) {
+            setMessage(`ユーザー登録処理に失敗しました ${error.message}`);
+            return;
+          }
+        } else {
+          // 招待コードがない場合は新しいグループを作成
+          const { data, error } = await supabase.functions.invoke('create-group', {
+            body: JSON.stringify({ userId: authData.user.id, userName: user.name }),
+          });
+
+          if (error) {
+            setMessage(`グループの作成に失敗しました: ${error.message}`);
+            return;
+          }
+          if (!data.success) {
+            setMessage(`グループの作成に失敗しました: ${data.error}`);
+          }
+        }
+
         setMessage('ユーザー登録が完了しました');
       } else {
         setMessage('ユーザー登録に失敗しました');

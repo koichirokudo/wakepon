@@ -9,3 +9,21 @@ ALTER TABLE households ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY "Users can view their own profile and group." ON households
     FOR SELECT USING (true);
+
+CREATE POLICY "Users can insert household" ON households
+    FOR INSERT WITH CHECK (auth.uid() IS NOT NULL);
+
+-- updated_at を自動更新するトリガー
+CREATE OR REPLACE FUNCTION update_timestamp()
+RETURNS TRIGGER AS $$
+BEGIN
+  NEW.updated_at = now();
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- トリガーを households テーブルに設定
+CREATE TRIGGER set_timestamp
+BEFORE INSERT OR UPDATE ON households
+FOR EACH ROW
+EXECUTE FUNCTION update_timestamp();

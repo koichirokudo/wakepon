@@ -15,3 +15,18 @@ TO public
 USING (
     (auth.uid() IS NOT NULL)
 );
+
+-- updated_at を自動更新するトリガー
+CREATE OR REPLACE FUNCTION update_timestamp()
+RETURNS TRIGGER AS $$
+BEGIN
+  NEW.updated_at = now();
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- トリガーを payment_methods テーブルに設定
+CREATE TRIGGER set_timestamp
+BEFORE INSERT OR UPDATE ON payment_methods
+FOR EACH ROW
+EXECUTE FUNCTION update_timestamp();

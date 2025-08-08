@@ -6,6 +6,7 @@ import './index.css'
 import Categories from './pages/Categories.tsx'
 import SignUp from './pages/SignUp.tsx'
 import SignIn from './pages/SignIn.tsx'
+import Invite from './pages/Invite.tsx'
 import { AuthProvider } from './contexts/AuthContext.tsx'
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
@@ -17,6 +18,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
           <Route path='/signin' element={<SignIn />} />
           <Route path='/signup' element={<SignUp />} />
           <Route path='/categories' element={<Categories />} />
+          <Route path='/invite' element={<Invite />} />
         </Routes>
       </AuthProvider>
     </BrowserRouter>
