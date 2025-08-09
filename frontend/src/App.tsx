@@ -17,6 +17,9 @@ function App() {
         <li>
           <a href="/invite">ユーザー招待</a>
         </li>
+        <li>
+          <a href="/profile">プロフィール</a>
+        </li>
       </ul>
     </div>
   );
