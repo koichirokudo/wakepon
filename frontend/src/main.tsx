@@ -8,6 +8,7 @@ import SignUp from './pages/SignUp.tsx'
 import SignIn from './pages/SignIn.tsx'
 import Invite from './pages/Invite.tsx'
 import Profile from './pages/Profile.tsx'
+import VerifyOtp from './pages/VerifyOtp.tsx'
 import { AuthProvider } from './contexts/AuthContext.tsx'
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
@@ -18,6 +19,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
           <Route path='/' element={<App />} />
           <Route path='/signin' element={<SignIn />} />
           <Route path='/signup' element={<SignUp />} />
+          <Route path='/verify-otp' element={<VerifyOtp />} />
           <Route path='/categories' element={<Categories />} />
           <Route path='/invite' element={<Invite />} />
           <Route path='/profile' element={<Profile />} />

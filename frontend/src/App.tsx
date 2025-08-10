@@ -1,5 +1,17 @@
 // src/App.tsx
+import { supabase } from './lib/supabaseClient';
+import { useNavigate } from 'react-router-dom';
+
 function App() {
+  const navigate = useNavigate();
+  const handleSignOut = async () => {
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      console.error('ログアウトに失敗しました:', error.message);
+    } else {
+      navigate('/signin', { state: { message: 'ログアウトしました。' } });
+    }
+  };
   return (
     <div>
       <h1>Hello WakeWake</h1>
@@ -21,6 +33,9 @@ function App() {
           <a href="/profile">プロフィール</a>
         </li>
       </ul>
+      
+      {/* ログイン時のみ表示したい */}
+      <button onClick={handleSignOut}>ログアウト</button>
     </div>
   );
 }

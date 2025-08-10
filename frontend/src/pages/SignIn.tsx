@@ -1,32 +1,27 @@
 // src/pages/SignIn.tsx
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabaseClient';
 
-type User = {
-  email: string;
-  password: string;
-};
-
 export default function SignIn() {
-  const [user, setUser] = useState<User>({ email: '', password: '' });
+  const [email, setEmail] = useState<string>('');
   const [message, setMessage] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const navigate = useNavigate();
 
   const handleSignIn = async () => {
     setIsLoading(true);
     setMessage('');
 
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email: user.email,
-        password: user.password,
+      const { error } = await supabase.auth.signInWithOtp({
+        email: email,
       });
 
-      if (error) {
-        setMessage('ログインに失敗しました: ' + error.message);
-      } else if (data && data.user) {
-        setMessage('ログインに成功しました');
+      if (!error) {
+        navigate('/verify-otp', { state: { email } });
       }
+
     } catch (error) {
       console.error(error);
     } finally {
@@ -38,9 +33,9 @@ export default function SignIn() {
     <div>
       <h1>ログイン</h1>
       <form onSubmit={(e) => e.preventDefault()}>
-        <input type="email" placeholder="メールアドレス" value={user.email} onChange={(e) => setUser({ ...user, email: e.target.value })} required /><br />
-        <input type="password" placeholder="パスワード" value={user.password} onChange={(e) => setUser({ ...user, password: e.target.value })} required /><br />
+        <input type="email" placeholder="メールアドレス" value={email} onChange={(e) => setEmail(e.target.value)} required /><br />
         <input type="button" value="ログインする" onClick={handleSignIn} /><br />
+        <input type="button" value="新規登録はこちら" onClick={() => window.location.href = '/signup'} /><br />
         {isLoading && <p>ログイン中...</p>}
         {message && <p>{message}</p>}
       </form>
