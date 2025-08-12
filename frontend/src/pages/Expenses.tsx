@@ -31,7 +31,7 @@ export default function Expenses() {
   const [memo, setMemo] = useState<string>('');
   const [categories, setCategories] = useState<{ id: string; name: string }[]>([]);
   const [paymentMethods, setPaymentMethods] = useState<{ id: string; name: string }[]>([]);
-
+  const [editingExpenseId, setEditingExpenseId] = useState<string | null>(null);
 
   // 支出一覧を取得
   useEffect(() => {
@@ -99,6 +99,27 @@ export default function Expenses() {
     fetchPaymentMethods();
   }, []);
 
+  // 編集用の関数
+  const startEditExpense = (expense: Expense) => {
+    setEditingExpenseId(expense.id);
+    setDate(expense.date.slice(0, 10)); // yyyy-mm-dd形式にしてセット
+    setAmount(expense.amount.toString());
+    setCategoryId(expense.category.id);
+    setPaymentMethodId(expense.paymentMethod.id);
+    setMemo(expense.memo || '');
+  };
+
+  // 編集キャンセル用の関数
+  const cancelEdit = () => {
+    setEditingExpenseId(null);
+    setDate('');
+    setAmount('');
+    setCategoryId('');
+    setPaymentMethodId('');
+    setMemo('');
+  };
+
+  // 支出の追加
   const handleAddExpense = async (expense: ExpenseInput) => {
     const { data, error } = await supabase
       .from('expenses')
@@ -117,17 +138,74 @@ export default function Expenses() {
       console.error('支出の追加に失敗しました:', error.message);
     } else if (data) {
       // 新しい支出をリストに追加
-      setExpenses((prevExpenses) => [
-        ...prevExpenses,
-        {
-          id: data.id,
-          date: data.date,
-          amount: data.amount,
-          memo: data.memo,
-          category: Array.isArray(data.categories) ? data.categories[0] : data.categories,
-          paymentMethod: Array.isArray(data.payment_methods) ? data.payment_methods[0] : data.payment_methods,
-        },
-      ]);
+      setExpenses((prev) => {
+        const newExpense = [
+          ...prev,
+          {
+            id: data.id,
+            date: data.date,
+            amount: data.amount,
+            memo: data.memo,
+            category: Array.isArray(data.categories) ? data.categories[0] : data.categories,
+            paymentMethod: Array.isArray(data.payment_methods) ? data.payment_methods[0] : data.payment_methods,
+          },
+        ];
+        // 日付で降順ソート
+        newExpense.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+        return newExpense;
+      });
+    }
+  };
+
+  // 支出の更新
+  const handleUpdateExpense = async () => {
+    if (!editingExpenseId) return;
+
+    const { data, error } = await supabase
+      .from('expenses')
+      .update({
+        date,
+        amount: parseFloat(amount),
+        category_id: categoryId,
+        payment_method_id: paymentMethodId,
+        memo,
+      })
+      .eq('id', editingExpenseId)
+      .select(`id, date, amount, memo, categories(id, name), payment_methods(id, name)`)
+      .single();
+
+    if (error) {
+      console.error('支出の更新に失敗しました:', error.message);
+    } else if (data) {
+      // 更新された支出をリストに反映
+      setExpenses((prev) =>
+        prev.map((expense) =>
+          expense.id === editingExpenseId
+            ? {
+              id: data.id,
+              date: data.date,
+              amount: data.amount,
+              memo: data.memo,
+              category: Array.isArray(data.categories) ? data.categories[0] : data.categories,
+              paymentMethod: Array.isArray(data.payment_methods) ? data.payment_methods[0] : data.payment_methods,
+            }
+            : expense
+        )
+      );
+      cancelEdit();
+    }
+  };
+
+  // 支出の削除
+  const handleDeleteExpense = async (id: string) => {
+    if (!confirm('本当に削除しますか？')) return;
+
+    const { error } = await supabase.from('expenses').delete().eq('id', id);
+
+    if (error) {
+      console.error('支出の削除に失敗しました:', error.message);
+    } else {
+      setExpenses((prev) => prev.filter((expense) => expense.id !== id));
     }
   };
 
@@ -151,13 +229,28 @@ export default function Expenses() {
             ))}
           </select> <br />
           <input type="text" placeholder="メモ" value={memo} onChange={(e) => setMemo(e.target.value)} /> <br /><br />
-          <input type="button" value="支出を追加" onClick={() => handleAddExpense({
-            date: date,
-            amount: amount,
-            categoryId: categoryId,
-            paymentMethodId: paymentMethodId,
-            memo: memo,
-          })} />
+          {editingExpenseId ? (
+            <>
+              <input
+                type="button"
+                value="保存"
+                onClick={handleUpdateExpense}
+              />
+              <input
+                type="button"
+                value="キャンセル"
+                onClick={cancelEdit}
+              />
+            </>
+          ) : (
+            <input type="button" value="支出を追加" onClick={() => handleAddExpense({
+              date: date,
+              amount: amount,
+              categoryId: categoryId,
+              paymentMethodId: paymentMethodId,
+              memo: memo,
+            })} />
+          )}
           <br />
         </form>
       </div>
@@ -170,6 +263,8 @@ export default function Expenses() {
             {expenses.map((expense) => (
               <li key={expense.id}>
                 {new Date(expense.date).toLocaleDateString('ja-JP')}: {expense.category?.name} {expense.amount}円 - {expense.paymentMethod?.name} {expense.memo && `(${expense.memo})`}
+                <button onClick={() => startEditExpense(expense)}>編集</button>
+                <button onClick={() => handleDeleteExpense(expense.id)}>削除</button>
               </li>
             ))}
           </ul>
