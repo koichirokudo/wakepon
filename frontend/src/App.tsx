@@ -24,6 +24,9 @@ function App() {
           <a href="/signin">ログイン</a>
         </li>
         <li>
+          <a href="/expenses">支出一覧</a>
+        </li>
+        <li>
           <a href="/categories">カテゴリ一覧</a>
         </li>
         <li>
@@ -33,7 +36,7 @@ function App() {
           <a href="/profile">プロフィール</a>
         </li>
       </ul>
-      
+
       {/* ログイン時のみ表示したい */}
       <button onClick={handleSignOut}>ログアウト</button>
     </div>
