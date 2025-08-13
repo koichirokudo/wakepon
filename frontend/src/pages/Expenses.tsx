@@ -7,6 +7,7 @@ type Expense = {
   id: string;
   date: string;
   amount: number;
+  users: { name: string };
   category: { id: string; name: string };
   paymentMethod: { id: string; name: string };
   memo?: string;
@@ -39,7 +40,7 @@ export default function Expenses() {
       setIsLoading(true);
       const { data, error } = await supabase
         .from('expenses')
-        .select(`id, date, amount, memo, categories(id, name), payment_methods(id, name)`)
+        .select(`id, date, amount, memo, users(name), categories(id, name), payment_methods(id, name)`)
         .order('date', { ascending: false });
 
       if (error) {
@@ -51,6 +52,7 @@ export default function Expenses() {
             date: item.date,
             amount: item.amount,
             memo: item.memo,
+            users: item.users,
             category: item.categories,
             paymentMethod: item.payment_methods,
           }))
@@ -146,6 +148,7 @@ export default function Expenses() {
             date: data.date,
             amount: data.amount,
             memo: data.memo,
+            users: { id: userId, name: '' },
             category: Array.isArray(data.categories) ? data.categories[0] : data.categories,
             paymentMethod: Array.isArray(data.payment_methods) ? data.payment_methods[0] : data.payment_methods,
           },
@@ -186,6 +189,7 @@ export default function Expenses() {
               date: data.date,
               amount: data.amount,
               memo: data.memo,
+              users: expense.users,
               category: Array.isArray(data.categories) ? data.categories[0] : data.categories,
               paymentMethod: Array.isArray(data.payment_methods) ? data.payment_methods[0] : data.payment_methods,
             }
@@ -262,7 +266,7 @@ export default function Expenses() {
           <ul>
             {expenses.map((expense) => (
               <li key={expense.id}>
-                {new Date(expense.date).toLocaleDateString('ja-JP')}: {expense.category?.name} {expense.amount}円 - {expense.paymentMethod?.name} {expense.memo && `(${expense.memo})`}
+                {new Date(expense.date).toLocaleDateString('ja-JP')}: {expense.category?.name} {expense.amount}円 - {expense.paymentMethod?.name} {expense.memo && `(${expense.memo})`} {expense.users.name}
                 <button onClick={() => startEditExpense(expense)}>編集</button>
                 <button onClick={() => handleDeleteExpense(expense.id)}>削除</button>
               </li>
