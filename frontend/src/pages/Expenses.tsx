@@ -28,7 +28,7 @@ type Settlement = {
 };
 
 export default function Expenses() {
-  const { householdId, userId } = useAuth();
+  const { householdId, userId, userName } = useAuth();
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [date, setDate] = useState<string>('');
@@ -232,7 +232,7 @@ export default function Expenses() {
             date: data.date,
             amount: data.amount,
             memo: data.memo,
-            users: { id: userId, name: '' },
+            users: { id: userId, name: userName ?? '不明' },
             category: Array.isArray(data.categories) ? data.categories[0] : data.categories,
             paymentMethod: Array.isArray(data.payment_methods) ? data.payment_methods[0] : data.payment_methods,
           },
