@@ -21,6 +21,12 @@ type ExpenseInput = {
   memo?: string;
 };
 
+type Settlement = {
+  from: string;
+  to: string;
+  amount: number;
+};
+
 export default function Expenses() {
   const { householdId, userId } = useAuth();
   const [expenses, setExpenses] = useState<Expense[]>([]);
@@ -38,6 +44,53 @@ export default function Expenses() {
     return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
   });
 
+  // 月の総支出額
+  const totalAmount = expenses.reduce((sum, exp) => sum + exp.amount, 0);
+
+  // ユーザー別支払額集計 (名前をキーに)
+  const paidByUser: Record<string, number> = {};
+  expenses.forEach(exp => {
+    const userName = exp.users?.name || '不明';
+    paidByUser[userName] = (paidByUser[userName] || 0) + exp.amount;
+  });
+
+  function calculateSettlements(paidByUser: Record<string, number>): Settlement[] {
+    const users = Object.keys(paidByUser);
+    const total = Object.values(paidByUser).reduce((a, b) => a + b, 0);
+    const perUserShare = total / users.length;
+
+    // 借り手と貸し手に分ける
+    const borrowers = users
+      .map(user => ({ user, diff: perUserShare - (paidByUser[user] || 0) }))
+      .filter(({ diff }) => diff > 0) // 足りない人
+
+    const lenders = users
+      .map(user => ({ user, diff: (paidByUser[user] || 0) - perUserShare }))
+      .filter(({ diff }) => diff > 0) // 多く払った人
+
+    const settlements: Settlement[] = [];
+
+    let i = 0, j = 0;
+    while (i < borrowers.length && j < lenders.length) {
+      const borrower = borrowers[i];
+      const lender = lenders[j];
+      const amount = Math.min(borrower.diff, lender.diff);
+
+      settlements.push({
+        from: borrower.user,
+        to: lender.user,
+        amount,
+      });
+
+      borrower.diff -= amount;
+      lender.diff -= amount;
+
+      if (borrower.diff === 0) i++;
+      if (lender.diff === 0) j++;
+    }
+
+    return settlements;
+  }
 
   // 過去1年分の年月を配列で生成
   const getPastYearMonths = (): string[] => {
@@ -244,6 +297,8 @@ export default function Expenses() {
     }
   };
 
+  const settlements = calculateSettlements(paidByUser);
+
   return (
     <>
       <div>
@@ -309,6 +364,25 @@ export default function Expenses() {
                 <button onClick={() => startEditExpense(expense)}>編集</button>
                 <button onClick={() => handleDeleteExpense(expense.id)}>削除</button>
               </li>
+            ))}
+          </ul>
+        )}
+      </div>
+      <div>
+        <h2>月ごとの総支出額: {totalAmount.toLocaleString()}円</h2>
+        <h3>ユーザー別支払額</h3>
+        <ul>
+          {Object.entries(paidByUser).map(([user, amount]) => (
+            <li key={user}>{user}: {amount.toLocaleString()}円</li>
+          ))}
+        </ul>
+        <h3>精算が必要な金額</h3>
+        {settlements.length === 0 ? (
+          <p>精算は不要です</p>
+        ) : (
+          <ul>
+            {settlements.map(({ from, to, amount }, i) => (
+              <li key={i}>{from} → {to}: {amount.toLocaleString()}円</li>
             ))}
           </ul>
         )}
