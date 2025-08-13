@@ -15,8 +15,6 @@ export default function Invite() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const appOrigin = import.meta.env.VITE_APP_ORIGIN || 'http://localhost:5173';
 
-  console.log('householdId:', householdId);
-  console.log('userName:', userName);
   useEffect(() => {
     if (!householdId || !userName) {
       setMessage('ログイン情報が正しく取得できません。');
