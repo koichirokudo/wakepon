@@ -305,7 +305,7 @@ export default function Expenses() {
         <h1>支出入力</h1>
         <form onSubmit={(e) => e.preventDefault()}>
           <input type="date" value={date} onChange={(e) => setDate(e.target.value)} required /><br />
-          <input type="number" placeholder="金額" value={amount} onChange={(e) => setAmount(e.target.value)} required /> <br />
+          <input type="number" placeholder="金額" min={0} max={99999999} value={amount} onChange={(e) => setAmount(e.target.value)} required /> <br />
           <select required value={categoryId} onChange={(e) => setCategoryId(e.target.value)}>
             <option value="">カテゴリを選択</option>
             {categories.map((cat) => (
@@ -318,7 +318,7 @@ export default function Expenses() {
               <option key={pm.id} value={pm.id}>{pm.name}</option>
             ))}
           </select> <br />
-          <input type="text" placeholder="メモ" value={memo} onChange={(e) => setMemo(e.target.value)} /> <br /><br />
+          <input type="text" placeholder="メモ" value={memo} maxLength={10} onChange={(e) => setMemo(e.target.value)} /> <br /><br />
           {editingExpenseId ? (
             <>
               <input
@@ -369,7 +369,7 @@ export default function Expenses() {
         )}
       </div>
       <div>
-        <h2>月ごとの総支出額: {totalAmount.toLocaleString()}円</h2>
+        <h2>{selectedMonth}の総支出額: {totalAmount.toLocaleString()}円</h2>
         <h3>ユーザー別支払額</h3>
         <ul>
           {Object.entries(paidByUser).map(([user, amount]) => (
