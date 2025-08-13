@@ -33,14 +33,45 @@ export default function Expenses() {
   const [categories, setCategories] = useState<{ id: string; name: string }[]>([]);
   const [paymentMethods, setPaymentMethods] = useState<{ id: string; name: string }[]>([]);
   const [editingExpenseId, setEditingExpenseId] = useState<string | null>(null);
+  const [selectedMonth, setSelectedMonth] = useState<string>(() => {
+    const now = new Date();
+    return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+  });
+
+
+  // 過去1年分の年月を配列で生成
+  const getPastYearMonths = (): string[] => {
+    const months = [];
+    const now = new Date();
+    for (let i = 0; i < 12; i++) {
+      const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      const y = date.getFullYear();
+      const m = String(date.getMonth() + 1).padStart(2, '0');
+      months.push(`${y}-${m}`);
+    }
+    return months;
+  };
 
   // 支出一覧を取得
   useEffect(() => {
+    if (!selectedMonth) return;
     const fetchExpenses = async () => {
       setIsLoading(true);
+
+      // selectedMonthのYYYY-MMから開始日と終了日を計算
+      const startDate = `${selectedMonth}-01`;
+
+      // 月の翌月の1日を計算（終了日の次の日）
+      const [year, month] = selectedMonth.split('-').map(Number);
+      const endDateObj = new Date(year, month, 1);
+      const endDate = endDateObj.toISOString().slice(0, 10); // yyyy-mm-dd
+
+      // クエリでdateの範囲指定
       const { data, error } = await supabase
         .from('expenses')
         .select(`id, date, amount, memo, users(name), categories(id, name), payment_methods(id, name)`)
+        .gte('date', startDate)
+        .lt('date', endDate)
         .order('date', { ascending: false });
 
       if (error) {
@@ -62,7 +93,7 @@ export default function Expenses() {
     };
 
     fetchExpenses();
-  }, []);
+  }, [selectedMonth]);
 
   // カテゴリの選択肢を取得
   useEffect(() => {
@@ -260,6 +291,14 @@ export default function Expenses() {
       </div>
       <div>
         <h1>支出一覧</h1>
+        {/* 月選択プルダウン */}
+        <select value={selectedMonth} onChange={(e) => setSelectedMonth(e.target.value)}>
+          {getPastYearMonths().map((ym) => (
+            <option key={ym} value={ym}>
+              {ym}
+            </option>
+          ))}
+        </select>
         {isLoading ? (
           <p>読み込み中...</p>
         ) : (
