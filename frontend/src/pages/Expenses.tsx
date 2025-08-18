@@ -6,7 +6,6 @@ import type { Expense, ExpenseInput, Settlement } from '../types';
 import ExpenseList from '../components/ExpenseList';
 import ExpenseForm from '../components/ExpenseForm';
 import ExpenseSummary from '../components/ExpenseSummary';
-import { UNSAFE_mapRouteProperties } from 'react-router-dom';
 
 export default function Expenses() {
   const { householdId, userId, userName } = useAuth();
