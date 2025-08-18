@@ -10,6 +10,7 @@ import ExpenseSummary from '../components/ExpenseSummary';
 export default function Expenses() {
   const { householdId, userId, userName } = useAuth();
   const [expenses, setExpenses] = useState<Expense[]>([]);
+  const [expensesCache, setExpensesCache] = useState<Record<string, Expense[]>>({})
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [date, setDate] = useState<string>('');
   const [amount, setAmount] = useState<string>('');
@@ -88,6 +89,14 @@ export default function Expenses() {
   // 支出一覧を取得
   useEffect(() => {
     if (!selectedMonth) return;
+
+    // キャッシュにあれば取得せずにキャッシュからセットする
+    if (expensesCache[selectedMonth]) {
+      setExpenses(expensesCache[selectedMonth]);
+      setIsLoading(false);
+      return;
+    }
+
     const fetchExpenses = async () => {
       setIsLoading(true);
 
@@ -110,17 +119,19 @@ export default function Expenses() {
       if (error) {
         console.error('費用の取得に失敗しました:', error.message);
       } else {
-        setExpenses(
-          (data || []).map((item: any) => ({
-            id: item.id,
-            date: item.date,
-            amount: item.amount,
-            memo: item.memo,
-            users: item.users,
-            category: item.categories,
-            paymentMethod: item.payment_methods,
-          }))
-        );
+        const mapped = (data || []).map((item: any) => ({
+          id: item.id,
+          date: item.date,
+          amount: item.amount,
+          memo: item.memo,
+          users: item.users,
+          category: item.categories,
+          paymentMethod: item.payment_methods,
+        }));
+
+        // キャッシュに保存
+        setExpensesCache(prev => ({ ...prev, [selectedMonth]: mapped }));
+        setExpenses(mapped);
       }
       setIsLoading(false);
     };
