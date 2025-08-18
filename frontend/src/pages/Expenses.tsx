@@ -189,6 +189,17 @@ export default function Expenses() {
 
   // 支出追加
   const handleAddExpense = async (expense: ExpenseInput) => {
+    if (!householdId || !userId) {
+      handleError('グループIDまたはユーザーIDが設定されていません', null);
+      return;
+    };
+
+    const amt = parseFloat(expense.amount);
+    if (Number.isNaN(amt) || amt <= 0) {
+      handleError('金額が不正です', null);
+      return;
+    }
+
     const { data, error } = await supabase
       .from('expenses')
       .insert({
@@ -228,11 +239,22 @@ export default function Expenses() {
   const handleUpdateExpense = async () => {
     if (!editingExpenseId) return;
 
+    if (!householdId || !userId) {
+      handleError('グループIDまたはユーザーIDが設定されていません', null);
+      return;
+    };
+
+    const amt = parseFloat(amount);
+    if (Number.isNaN(amt) || amt <= 0) {
+      handleError('金額が不正です', null);
+      return;
+    }
+
     const { data, error } = await supabase
       .from('expenses')
       .update({
         date,
-        amount: parseFloat(amount),
+        amount: amt,
         category_id: categoryId,
         payment_method_id: paymentMethodId,
         memo,
