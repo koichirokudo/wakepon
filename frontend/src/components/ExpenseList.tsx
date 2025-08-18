@@ -1,25 +1,41 @@
-// src/components/ExpenseList.tsx
-import type { Expense } from '../types';
+import type { Expense } from "../types";
 
 type ExpenseListProps = {
   expenses: Expense[];
-  onEdit: (exp: Expense) => void;
+  onEdit: (expense: Expense) => void;
   onDelete: (id: string) => void;
 };
 
 export default function ExpenseList({ expenses, onEdit, onDelete }: ExpenseListProps) {
-  if (expenses.length === 0) return <p>データがありません</p>;
-
   return (
-    <ul>
-      {expenses.map(exp => (
-        <li key={exp.id}>
-          {new Date(exp.date).toLocaleDateString('ja-JP')}:
-          {exp.category?.name} {exp.amount}円 - {exp.paymentMethod?.name} {exp.memo && `(${exp.memo})`} {exp.users.name}
-          <button onClick={() => onEdit(exp)}>編集</button>
-          <button onClick={() => onDelete(exp.id)}>削除</button>
-        </li>
-      ))}
-    </ul>
+    <table border={1} style={{ borderCollapse: "collapse", width: "100%" }}>
+      <thead>
+        <tr>
+          <th>日付</th>
+          <th>カテゴリ</th>
+          <th style={{ textAlign: "right" }}>金額</th>
+          <th>支払い方法</th>
+          <th>メモ</th>
+          <th>ユーザー</th>
+          <th>操作</th>
+        </tr>
+      </thead>
+      <tbody>
+        {expenses.map((expense) => (
+          <tr key={expense.id}>
+            <td>{new Date(expense.date).toLocaleDateString("ja-JP")}</td>
+            <td>{expense.category?.name}</td>
+            <td style={{ textAlign: "right" }}>{expense.amount.toLocaleString()}円</td>
+            <td>{expense.paymentMethod?.name}</td>
+            <td>{expense.memo}</td>
+            <td>{expense.users?.name}</td>
+            <td>
+              <button onClick={() => onEdit(expense)}>編集</button>
+              <button onClick={() => onDelete(expense.id)}>削除</button>
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
   );
 }

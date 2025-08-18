@@ -308,6 +308,7 @@ export default function Expenses() {
       <div>
         <h1>支出一覧</h1>
         {/* 月選択プルダウン */}
+        <label htmlFor="month-select">月を選択:</label>
         <select value={selectedMonth} onChange={(e) => setSelectedMonth(e.target.value)}>
           {getPastYearMonths().map((ym) => (
             <option key={ym} value={ym}>
@@ -315,6 +316,8 @@ export default function Expenses() {
             </option>
           ))}
         </select>
+        <br /><br />
+        {/* 支出一覧 */}
         {isLoading ? (
           <p>読み込み中...</p>
         ) : (
