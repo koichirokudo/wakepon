@@ -1,8 +1,11 @@
 // src/pages/Expenses.tsx
 import { useState, useEffect } from 'react';
-import { useAuth } from '../contexts/AuthContext'; // Assuming you have a custom hook for auth
+import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabaseClient';
 import type { Expense, ExpenseInput, Settlement } from '../types';
+import ExpenseList from '../components/ExpenseList';
+import ExpenseForm from '../components/ExpenseForm';
+import ExpenseSummary from '../components/ExpenseSummary';
 
 export default function Expenses() {
   const { householdId, userId, userName } = useAuth();
@@ -280,46 +283,27 @@ export default function Expenses() {
     <>
       <div>
         <h1>支出入力</h1>
-        <form onSubmit={(e) => e.preventDefault()}>
-          <input type="date" value={date} onChange={(e) => setDate(e.target.value)} required /><br />
-          <input type="number" placeholder="金額" min={0} max={99999999} value={amount} onChange={(e) => setAmount(e.target.value)} required /> <br />
-          <select required value={categoryId} onChange={(e) => setCategoryId(e.target.value)}>
-            <option value="">カテゴリを選択</option>
-            {categories.map((cat) => (
-              <option key={cat.id} value={cat.id}>{cat.name}</option>
-            ))}
-          </select> <br />
-          <select required value={paymentMethodId} onChange={(e) => setPaymentMethodId(e.target.value)}>
-            <option value="">支払い方法を選択</option>
-            {paymentMethods.map((pm) => (
-              <option key={pm.id} value={pm.id}>{pm.name}</option>
-            ))}
-          </select> <br />
-          <input type="text" placeholder="メモ" value={memo} maxLength={10} onChange={(e) => setMemo(e.target.value)} /> <br /><br />
-          {editingExpenseId ? (
-            <>
-              <input
-                type="button"
-                value="保存"
-                onClick={handleUpdateExpense}
-              />
-              <input
-                type="button"
-                value="キャンセル"
-                onClick={cancelEdit}
-              />
-            </>
-          ) : (
-            <input type="button" value="支出を追加" onClick={() => handleAddExpense({
-              date: date,
-              amount: amount,
-              categoryId: categoryId,
-              paymentMethodId: paymentMethodId,
-              memo: memo,
-            })} />
-          )}
-          <br />
-        </form>
+        <ExpenseForm
+          categories={categories}
+          paymentMethods={paymentMethods}
+          values={{ date, amount, categoryId, paymentMethodId, memo }}
+          editing={!!editingExpenseId}
+          onSubmit={editingExpenseId ? handleUpdateExpense : () => handleAddExpense({
+            date,
+            amount,
+            categoryId,
+            paymentMethodId,
+            memo,
+          })}
+          onChange={({ date, amount, categoryId, paymentMethodId, memo }) => {
+            setDate(date);
+            setAmount(amount);
+            setCategoryId(categoryId);
+            setPaymentMethodId(paymentMethodId);
+            setMemo(memo ?? '');
+          }}
+          onCancel={cancelEdit}
+        />
       </div>
       <div>
         <h1>支出一覧</h1>
@@ -334,35 +318,12 @@ export default function Expenses() {
         {isLoading ? (
           <p>読み込み中...</p>
         ) : (
-          <ul>
-            {expenses.map((expense) => (
-              <li key={expense.id}>
-                {new Date(expense.date).toLocaleDateString('ja-JP')}: {expense.category?.name} {expense.amount}円 - {expense.paymentMethod?.name} {expense.memo && `(${expense.memo})`} {expense.users.name}
-                <button onClick={() => startEditExpense(expense)}>編集</button>
-                <button onClick={() => handleDeleteExpense(expense.id)}>削除</button>
-              </li>
-            ))}
-          </ul>
+          <ExpenseList expenses={expenses} onEdit={startEditExpense} onDelete={handleDeleteExpense} />
         )}
       </div>
       <div>
-        <h2>{selectedMonth}の総支出額: {totalAmount.toLocaleString()}円</h2>
-        <h3>ユーザー別支払額</h3>
-        <ul>
-          {Object.entries(paidByUser).map(([user, amount]) => (
-            <li key={user}>{user}: {amount.toLocaleString()}円</li>
-          ))}
-        </ul>
-        <h3>精算が必要な金額</h3>
-        {settlements.length === 0 ? (
-          <p>精算は不要です</p>
-        ) : (
-          <ul>
-            {settlements.map(({ from, to, amount }, i) => (
-              <li key={i}>{from} → {to}: {amount.toLocaleString()}円</li>
-            ))}
-          </ul>
-        )}
+        <h1>支出集計</h1>
+        <ExpenseSummary selectedMonth={selectedMonth} totalAmount={totalAmount} paidByUser={paidByUser} settlements={settlements} />
       </div>
     </>
   );
