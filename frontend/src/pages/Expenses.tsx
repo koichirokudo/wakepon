@@ -1,11 +1,12 @@
 // src/pages/Expenses.tsx
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabaseClient';
 import type { Expense, ExpenseInput, Settlement } from '../types';
 import ExpenseList from '../components/ExpenseList';
 import ExpenseForm from '../components/ExpenseForm';
 import ExpenseSummary from '../components/ExpenseSummary';
+import { UNSAFE_mapRouteProperties } from 'react-router-dom';
 
 export default function Expenses() {
   const { householdId, userId, userName } = useAuth();
@@ -26,14 +27,20 @@ export default function Expenses() {
   });
 
   // 月の総支出額
-  const totalAmount = expenses.reduce((sum, exp) => sum + exp.amount, 0);
+  const totalAmount = useMemo(
+    () => expenses.reduce((sum, exp) => sum + exp.amount, 0),
+    [expenses]
+  );
 
   // ユーザー別支払額集計 (名前をキーに)
-  const paidByUser: Record<string, number> = {};
-  expenses.forEach(exp => {
-    const userName = exp.users?.name || '不明';
-    paidByUser[userName] = (paidByUser[userName] || 0) + exp.amount;
-  });
+  const paidByUser = useMemo(() => {
+    const map: Record<string, number> = {};
+    expenses.forEach(exp => {
+      const name = exp.users?.name ?? '不明';
+      map[name] = (map[name] || 0) + exp.amount;
+    });
+    return map;
+  }, [expenses]);
 
   function calculateSettlements(paidByUser: Record<string, number>): Settlement[] {
     const users = Object.keys(paidByUser);
