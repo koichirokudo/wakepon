@@ -2,30 +2,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext'; // Assuming you have a custom hook for auth
 import { supabase } from '../lib/supabaseClient';
-
-type Expense = {
-  id: string;
-  date: string;
-  amount: number;
-  users: { name: string };
-  category: { id: string; name: string };
-  paymentMethod: { id: string; name: string };
-  memo?: string;
-};
-
-type ExpenseInput = {
-  date: string;
-  amount: string;
-  categoryId: string;
-  paymentMethodId: string;
-  memo?: string;
-};
-
-type Settlement = {
-  from: string;
-  to: string;
-  amount: number;
-};
+import type { Expense, ExpenseInput, Settlement } from '../types';
 
 export default function Expenses() {
   const { householdId, userId, userName } = useAuth();

@@ -1,12 +1,7 @@
 // src/pages/Categories.tsx
 import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabaseClient';
-
-type Category = {
-  id: string;
-  name: string;
-  is_custom: boolean;
-};
+import type { Category } from '../types';
 
 export default function Categories() {
   const [categories, setCategories] = useState<Category[]>([]);

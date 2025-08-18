@@ -2,12 +2,7 @@
 import { useState } from 'react';
 import { supabase } from '../lib/supabaseClient';
 import { useSearchParams } from 'react-router-dom';
-
-type User = {
-  name: string;
-  email: string;
-  password: string;
-};
+import type { User } from '../types';
 
 export default function SignUp() {
   const [user, setUser] = useState<User>({ name: '', email: '', password: '' });

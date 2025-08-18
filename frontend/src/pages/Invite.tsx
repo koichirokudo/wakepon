@@ -3,10 +3,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabaseClient';
 import { useAuth } from '../contexts/AuthContext';
 import { nanoid } from 'nanoid';
-
-type Invite = {
-  email: string;
-};
+import type { Invite } from '../types';
 
 export default function Invite() {
   const { householdId, userName } = useAuth();
