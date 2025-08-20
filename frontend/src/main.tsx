@@ -11,20 +11,48 @@ import Invite from './pages/Invite.tsx'
 import Profile from './pages/Profile.tsx'
 import VerifyOtp from './pages/VerifyOtp.tsx'
 import { AuthProvider } from './contexts/AuthContext.tsx'
+import Layout from './Layout.tsx'
+import ProtectedRoute from './components/ProtectedRoute.tsx'
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <BrowserRouter>
       <AuthProvider>
         <Routes>
-          <Route path='/' element={<App />} />
+          {/* 誰でも見れる */}
           <Route path='/signin' element={<SignIn />} />
           <Route path='/signup' element={<SignUp />} />
           <Route path='/verify-otp' element={<VerifyOtp />} />
-          <Route path='/categories' element={<Categories />} />
-          <Route path='/invite' element={<Invite />} />
-          <Route path='/profile' element={<Profile />} />
-          <Route path='/expenses' element={<Expenses />} />
+
+          {/* ログイン必須ページは ProtectedRoute で守る */}
+          <Route element={<Layout>
+          </Layout>}>
+            <Route path='/' element={
+              <ProtectedRoute>
+                <App />
+              </ProtectedRoute>
+            } />
+            <Route path='/categories' element={
+              <ProtectedRoute>
+                <Categories />
+              </ProtectedRoute>
+            } />
+            <Route path='/invite' element={
+              <ProtectedRoute>
+                <Invite />
+              </ProtectedRoute>
+            } />
+            <Route path='/profile' element={
+              <ProtectedRoute>
+                <Profile />
+              </ProtectedRoute>
+            } />
+            <Route path='/expenses' element={
+              <ProtectedRoute>
+                <Expenses />
+              </ProtectedRoute>
+            } />
+          </Route>
         </Routes>
       </AuthProvider>
     </BrowserRouter>
