@@ -1,9 +1,10 @@
 // src/pages/SignIn.tsx
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { supabase } from '../lib/supabaseClient';
+import { useAuth } from '../contexts/AuthContext';
 
 export default function SignIn() {
+  const { signin } = useAuth();
   const [email, setEmail] = useState<string>('');
   const [message, setMessage] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -14,9 +15,7 @@ export default function SignIn() {
     setMessage('');
 
     try {
-      const { error } = await supabase.auth.signInWithOtp({
-        email: email,
-      });
+      const { error } = await signin(email);
 
       if (!error) {
         navigate('/verify-otp', { state: { email } });

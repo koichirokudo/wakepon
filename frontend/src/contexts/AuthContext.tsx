@@ -1,12 +1,15 @@
 // src/contexts/AuthContext.tsx
 import { createContext, useContext, useState, useEffect } from 'react';
 import { supabase } from '../lib/supabaseClient';
+import type { AuthError, AuthOtpResponse } from '@supabase/supabase-js';
 
 type AuthContextType = {
   userId: string | null;
   email: string | null;
   householdId: string | null;
   userName: string | null;
+  signin: (email: string) => Promise<AuthOtpResponse>;
+  signout: () => Promise<{ error: AuthError | null; }>;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -16,6 +19,16 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [email, setEmail] = useState<string | null>(null);
   const [householdId, setHouseholdId] = useState<string | null>(null);
   const [userName, setUserName] = useState<string | null>(null);
+
+  const signin = async (email: string) => {
+    return await supabase.auth.signInWithOtp({
+      email: email,
+    });
+  }
+
+  const signout = async () => {
+    return await supabase.auth.signOut();
+  }
 
   useEffect(() => {
     // 認証情報の取得
@@ -55,7 +68,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ userId, email, householdId, userName }}>
+    <AuthContext.Provider value={{ userId, email, householdId, userName, signin, signout }}>
       {children}
     </AuthContext.Provider>
   );
