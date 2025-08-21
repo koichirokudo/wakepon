@@ -11,7 +11,8 @@ ALTER TABLE household_members
     ADD CONSTRAINT unique_user_per_household UNIQUE (household_id, user_id);
 
 -- SELECT: 自分だけが見れる
-CREATE POLICY "Users can view their own household memberships" ON household_members 
+CREATE POLICY "Users can view their own household memberships" 
+    ON household_members 
     FOR SELECT
     USING (user_id = auth.uid());
 

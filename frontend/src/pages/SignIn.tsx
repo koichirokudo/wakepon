@@ -34,7 +34,6 @@ export default function SignIn() {
       <form onSubmit={(e) => e.preventDefault()}>
         <input type="email" placeholder="メールアドレス" value={email} onChange={(e) => setEmail(e.target.value)} required /><br />
         <input type="button" value="ログインする" onClick={handleSignIn} /><br />
-        <input type="button" value="新規登録はこちら" onClick={() => navigate('/signup')} /><br />
         {isLoading && <p>ログイン中...</p>}
         {message && <p>{message}</p>}
       </form>

@@ -3,7 +3,7 @@ import { useAuth } from "../contexts/AuthContext";
 
 export default function Header() {
   const { userName, signout } = useAuth();
-  const navigate = useNavigate();
+  const navigate = useNavigate()
 
   const handleSignOut = () => {
     signout();

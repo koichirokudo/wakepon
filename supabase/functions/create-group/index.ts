@@ -18,11 +18,11 @@ Deno.serve(async (req) => {
     return new Response('Unauthorized', { status: 401 })
   }
 
-  const { userId, userName } = await req.json()
+  const { userId } = await req.json()
   const data = {
     userId: userId,
-    userName: userName,
   }
+
   console.log("Received data:", data);
   try {
     // Supabaseクライアントの初期化
@@ -33,12 +33,20 @@ Deno.serve(async (req) => {
     );
 
     // ユーザーの認証情報を取得
-    const { data: userData, error: userError } = await supabaseClient.auth.getUser();
-    if (userError || !userData?.user) throw new Error("User not authenticated");
+    const { data: authData, error: authError } = await supabaseClient.auth.getUser();
+    if (authError || !authData?.user) throw new Error("User not authenticated");
+
+    // users テーブルの情報を取得
+    const { data: userData, error: userError } = await supabaseClient
+    .from('users')
+    .select()
+    .eq('id', userId)
+    .single(); 
+    console.log(userData);
 
     // householdテーブルに新しいグループを作成
     const { data: householdData, error: householdError } = await supabaseClient
-    .from('households').insert({name: userName + "のグループ",})
+    .from('households').insert({ name: userData.name + "のグループ" })
     .select().single();
 
     console.log("Created household:", householdData);

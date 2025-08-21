@@ -5,7 +5,6 @@ import App from './App.tsx'
 import './index.css'
 import Categories from './pages/Categories.tsx'
 import Expenses from './pages/Expenses.tsx'
-import SignUp from './pages/SignUp.tsx'
 import SignIn from './pages/SignIn.tsx'
 import Invite from './pages/Invite.tsx'
 import Profile from './pages/Profile.tsx'
@@ -21,7 +20,6 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
         <Routes>
           {/* 誰でも見れる */}
           <Route path='/signin' element={<SignIn />} />
-          <Route path='/signup' element={<SignUp />} />
           <Route path='/verify-otp' element={<VerifyOtp />} />
 
           {/* ログイン必須ページは ProtectedRoute で守る */}

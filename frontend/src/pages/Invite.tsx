@@ -45,14 +45,14 @@ export default function Invite() {
 
     try {
       // 招待メールの送信
-      // ローカル環境でのテスト http://localhost:5173/signup?invite_code={code}
+      // ローカル環境でのテスト http://localhost:5173/signin?invite_code={code}
       const { data, error } = await supabase.functions.invoke('send-invite', {
         body: JSON.stringify({
           to: invite.email,
           subject: `【わけわけ】${userName}さんがあなたを招待しました`,
           html: `<p>こんにちは！共有家計簿アプリのわけわけです。</p>
           <p>あなたを${userName}さんがグループに招待しています。以下のリンクから参加してください。</p>
-          <p><a href="${appOrigin}/signup?invite_code=${code}">招待リンク</a></p>`
+          <p><a href="${appOrigin}/signin?invite_code=${code}">招待リンク</a></p>`
         }),
       });
 
