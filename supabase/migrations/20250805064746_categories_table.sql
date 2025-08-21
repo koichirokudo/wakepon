@@ -12,11 +12,15 @@ ALTER TABLE categories ENABLE ROW LEVEL SECURITY;
 ALTER TABLE categories
     ADD CONSTRAINT unique_category_name_per_household UNIQUE (household_id, name);
 
-CREATE POLICY "Enable access to authenticated users only"
-ON "public"."categories"
-TO public
+CREATE POLICY "Users can view categories in their households"
+ON categories FOR SELECT
 USING (
-    (auth.uid() IS NOT NULL)
+    household_id IS NULL OR
+    EXISTS (
+        SELECT 1 FROM household_members
+        WHERE household_id = categories.household_id
+        AND user_id = auth.uid()
+    )
 );
 
 -- updated_at を自動更新するトリガー

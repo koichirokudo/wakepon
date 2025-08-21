@@ -10,14 +10,6 @@ CREATE TABLE invite_codes (
 
 ALTER TABLE invite_codes ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "Public can read valid invite codes"
-ON invite_codes
-FOR SELECT
-USING (
-  is_used = FALSE AND
-  expires_at > now()
-);
-
 -- UPDATE: household_members のみが invite_codes を更新できる
 CREATE POLICY "Users can update their own invite codes"
 ON invite_codes
