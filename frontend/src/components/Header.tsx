@@ -2,7 +2,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 
 export default function Header() {
-  const { userName, signout } = useAuth();
+  const { user, signout } = useAuth();
   const navigate = useNavigate()
 
   const handleSignOut = () => {
@@ -12,7 +12,7 @@ export default function Header() {
 
   return (
     <header style={{ background: "#eee", padding: "1rem" }}>
-      {userName ? (
+      {user?.id ? (
         <div>
           <nav>
             <Link to="/expenses">支払一覧</Link>
@@ -20,7 +20,7 @@ export default function Header() {
             <Link to="/invite">ユーザー招待</Link>
             <Link to="/profile">プロフィール</Link>
           </nav>
-          <p>ログイン中: {userName} </p>
+          <p>ログイン中: {user?.name} </p>
           <button onClick={handleSignOut}>ログアウト</button>
         </div>
       ) : (

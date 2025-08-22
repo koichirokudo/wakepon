@@ -1,8 +1,17 @@
 export type User = {
+  id: string;
   name: string;
-  email: string;
-  password: string;
+  created_at: Date;
+  updated_at: Date;
 };
+
+export type Member = {
+  id: string;
+  household_id: string;
+  user_id: string;
+  created_at: Date;
+  updated_at: Date;
+}
 
 export type Expense = {
   id: string;

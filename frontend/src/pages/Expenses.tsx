@@ -8,7 +8,7 @@ import ExpenseForm from '../components/ExpenseForm';
 import ExpenseSummary from '../components/ExpenseSummary';
 
 export default function Expenses() {
-  const { householdId, userId, userName } = useAuth();
+  const { user, member } = useAuth();
 
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [expensesCache, setExpensesCache] = useState<Record<string, Expense[]>>({});
@@ -94,13 +94,13 @@ export default function Expenses() {
 
   // カテゴリ取得
   useEffect(() => {
-    if (!householdId) return;
+    if (!member) return;
 
     const fetchCategories = async () => {
       const { data, error } = await supabase
         .from('categories')
         .select('*')
-        .or(`household_id.eq.${householdId},is_custom.eq.false`);
+        .or(`household_id.eq.${member?.household_id},is_custom.eq.false`);
 
       if (error) {
         handleError('カテゴリ取得失敗', error);
@@ -109,7 +109,7 @@ export default function Expenses() {
       }
     };
     fetchCategories();
-  }, [householdId]);
+  }, [member?.household_id]);
 
   // 支払い方法取得
   useEffect(() => {
@@ -189,7 +189,7 @@ export default function Expenses() {
 
   // 支出追加
   const handleAddExpense = async (expense: ExpenseInput) => {
-    if (!householdId || !userId) {
+    if (!user || !member) {
       handleError('グループIDまたはユーザーIDが設定されていません', null);
       return;
     };
@@ -203,8 +203,8 @@ export default function Expenses() {
     const { data, error } = await supabase
       .from('expenses')
       .insert({
-        household_id: householdId,
-        user_id: userId,
+        household_id: member?.household_id,
+        user_id: user?.id,
         amount: parseFloat(expense.amount),
         date: expense.date,
         category_id: expense.categoryId,
@@ -221,7 +221,7 @@ export default function Expenses() {
         date: data.date,
         amount: data.amount,
         memo: data.memo,
-        users: { name: userName ?? '不明' },
+        users: { name: user.name ?? '不明' },
         category: Array.isArray(data.categories) ? data.categories[0] : data.categories,
         paymentMethod: Array.isArray(data.payment_methods) ? data.payment_methods[0] : data.payment_methods,
       };
@@ -239,7 +239,7 @@ export default function Expenses() {
   const handleUpdateExpense = async () => {
     if (!editingExpenseId) return;
 
-    if (!householdId || !userId) {
+    if (!user || !member) {
       handleError('グループIDまたはユーザーIDが設定されていません', null);
       return;
     };

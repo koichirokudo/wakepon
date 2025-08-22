@@ -4,7 +4,7 @@ import { supabase } from '../lib/supabaseClient';
 import { useAuth } from '../contexts/AuthContext';
 
 export default function Profile() {
-  const { email } = useAuth();
+  const { session } = useAuth();
   const [changedEmail, setChangedEmail] = useState<string>('');
   const [message, setMessage] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -44,7 +44,7 @@ export default function Profile() {
         setIsLoading(false);
         return;
       }
-      if (changedEmail === email) {
+      if (changedEmail === session?.user.email) {
         setMessage('メールアドレスに変更はありません');
         setIsLoading(false);
         return;
@@ -78,7 +78,7 @@ export default function Profile() {
       ) : (
         <form onSubmit={(e) => e.preventDefault()}>
           <div>
-            現在のメールアドレス: {email || '未設定'}
+            現在のメールアドレス: {session?.user.email || '未設定'}
           </div>
           <div>
             <label>メールアドレス:</label>

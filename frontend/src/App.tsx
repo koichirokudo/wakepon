@@ -18,9 +18,6 @@ function App() {
       <p>これはわけわけのスタートです</p>
       <ul>
         <li>
-          <a href="/signup">ユーザー登録</a>
-        </li>
-        <li>
           <a href="/signin">ログイン</a>
         </li>
         <li>

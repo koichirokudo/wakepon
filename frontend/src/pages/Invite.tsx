@@ -6,19 +6,19 @@ import { nanoid } from 'nanoid';
 import type { Invite } from '../types';
 
 export default function Invite() {
-  const { householdId, userName } = useAuth();
+  const { user, member } = useAuth();
   const [invite, setInvite] = useState<Invite>({ email: '' });
   const [message, setMessage] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const appOrigin = import.meta.env.VITE_APP_ORIGIN || 'http://localhost:5173';
 
   useEffect(() => {
-    if (!householdId || !userName) {
+    if (!user || !member) {
       setMessage('ログイン情報が正しく取得できません。');
     } else {
       setMessage('');
     }
-  }, [householdId, userName]);
+  }, [user, member]);
 
   // 招待コードの生成関数
   // - nanoidを使ってランダムな12文字のコードを生成
@@ -38,7 +38,7 @@ export default function Invite() {
     const code = generateInviteCode();
     await supabase.from('invite_codes').insert({
       email: invite.email,
-      household_id: householdId,
+      household_id: member?.household_id,
       code: code,
       expires_at: new Date(Date.now() + 1000 * 60 * 60 * 24), // 24時間後に期限切れ
     });
@@ -49,9 +49,9 @@ export default function Invite() {
       const { data, error } = await supabase.functions.invoke('send-invite', {
         body: JSON.stringify({
           to: invite.email,
-          subject: `【わけわけ】${userName}さんがあなたを招待しました`,
+          subject: `【わけわけ】${user?.name}さんがあなたを招待しました`,
           html: `<p>こんにちは！共有家計簿アプリのわけわけです。</p>
-          <p>あなたを${userName}さんがグループに招待しています。以下のリンクから参加してください。</p>
+          <p>あなたを${user?.name}さんがグループに招待しています。以下のリンクから参加してください。</p>
           <p><a href="${appOrigin}/signin?invite_code=${code}">招待リンク</a></p>`
         }),
       });
