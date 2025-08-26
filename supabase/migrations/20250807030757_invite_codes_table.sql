@@ -10,6 +10,16 @@ CREATE TABLE invite_codes (
 
 ALTER TABLE invite_codes ENABLE ROW LEVEL SECURITY;
 
+CREATE POLICY "Users can view invite codes of their household"
+ON invite_codes FOR SELECT
+USING (
+    EXISTS (
+        SELECT 1 FROM household_members
+        WHERE household_id = invite_codes.household_id
+        AND user_id = auth.uid()
+    )
+);
+
 -- UPDATE: household_members のみが invite_codes を更新できる
 CREATE POLICY "Users can update their own invite codes"
 ON invite_codes

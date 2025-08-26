@@ -7,8 +7,15 @@ CREATE TABLE households(
 
 ALTER TABLE households ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "Users can view their own profile and group." ON households
-    FOR SELECT USING (true);
+-- ログインユーザーが household_members に登録されている household しか見えない
+CREATE POLICY "Users can view only their households" ON households
+FOR SELECT USING (
+    EXISTS (
+        SELECT 1 FROM household_members
+        WHERE household_id = households.id
+        AND user_id = auth.uid()
+    )
+);
 
 CREATE POLICY "Users can insert household" ON households
     FOR INSERT WITH CHECK (auth.uid() IS NOT NULL);

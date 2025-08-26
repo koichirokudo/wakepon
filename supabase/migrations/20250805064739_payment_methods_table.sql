@@ -9,11 +9,18 @@ ALTER TABLE payment_methods ENABLE ROW LEVEL SECURITY;
 ALTER TABLE payment_methods
     ADD CONSTRAINT unique_name UNIQUE (name);
 
-CREATE POLICY "Enable access to authenticated users only"
-ON "public"."payment_methods"
-TO public
+CREATE POLICY "Payment methods are read-only for authenticated users"
+ON payment_methods FOR SELECT
+USING (auth.uid() IS NOT NULL);
+
+CREATE POLICY "Only admins can manage payment methods"
+ON payment_methods FOR ALL
 USING (
-    (auth.uid() IS NOT NULL)
+    EXISTS (
+        SELECT 1 FROM auth.users
+        WHERE id = auth.uid()
+        AND raw_user_meta_data->>'role' = 'admin'
+    )
 );
 
 -- updated_at を自動更新するトリガー

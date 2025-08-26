@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { useSearchParams } from 'react-router-dom';
 
 export default function SignIn() {
   const { signin } = useAuth();
@@ -9,6 +10,8 @@ export default function SignIn() {
   const [message, setMessage] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const inviteCode = searchParams.get('invite_code');
 
   const handleSignIn = async () => {
     setIsLoading(true);
@@ -18,7 +21,7 @@ export default function SignIn() {
       const { error } = await signin(email);
 
       if (!error) {
-        navigate('/verify-otp', { state: { email } });
+        navigate(`/verify-otp?invite_code=${inviteCode}`, { state: { email } });
       }
 
     } catch (error) {
