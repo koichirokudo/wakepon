@@ -99,7 +99,7 @@ export default function Expenses() {
     const fetchCategories = async () => {
       const { data, error } = await supabase
         .from('categories')
-        .select('*')
+        .select()
         .or(`household_id.eq.${member?.household_id},is_custom.eq.false`);
 
       if (error) {

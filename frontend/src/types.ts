@@ -39,10 +39,16 @@ export type Settlement = {
 
 export type Category = {
   id: string;
+  household_id: string;
   name: string;
   is_custom: boolean;
+  created_at: Date;
+  updated_at: Date;
 };
 
+export type CategoryInput = {
+  name: string;
+};
 
 export type Invite = {
   email: string;

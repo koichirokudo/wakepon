@@ -15,7 +15,7 @@ export default function ExpenseForm({ categories, paymentMethods, values, editin
   return (
     <form onSubmit={(e) => { e.preventDefault(); onSubmit(); }}>
       <input type="date" value={values.date} onChange={(e) => onChange({ ...values, date: e.target.value })} required /><br />
-      <input type="number" placeholder="金額" min={0} max={99999999} value={values.amount} onChange={(e) => onChange({ ...values, amount: e.target.value })} required /> <br />
+      <input type="number" placeholder="金額" min={0} maxLength={10} value={values.amount} onChange={(e) => onChange({ ...values, amount: e.target.value })} required /> <br />
       <select required value={values.categoryId} onChange={(e) => onChange({ ...values, categoryId: e.target.value })}>
         <option value="">カテゴリを選択</option>
         {categories.map((cat) => (
@@ -39,6 +39,5 @@ export default function ExpenseForm({ categories, paymentMethods, values, editin
       )}
       <br />
     </form>
-
   );
 }

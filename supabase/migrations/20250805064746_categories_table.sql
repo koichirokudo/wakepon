@@ -15,8 +15,52 @@ ALTER TABLE categories
 CREATE POLICY "Users can view categories in their households"
 ON categories FOR SELECT
 USING (
-    household_id IS NULL OR
+    categories.household_id IS NULL OR
     EXISTS (
+        SELECT 1 FROM household_members
+        WHERE household_id = categories.household_id
+        AND user_id = auth.uid()
+    )
+);
+
+CREATE POLICY "Users can insert categories in their households"
+ON categories
+FOR INSERT
+WITH CHECK (
+    categories.household_id IS NOT NULL
+    AND EXISTS (
+        SELECT 1 FROM household_members
+        WHERE household_id = categories.household_id
+        AND user_id = auth.uid()
+    )
+);
+
+CREATE POLICY "Users can update categories in their households"
+ON categories 
+FOR UPDATE 
+USING (
+    categories.household_id IS NOT NULL
+    AND EXISTS (
+        SELECT 1 FROM household_members
+        WHERE household_id = categories.household_id
+        AND user_id = auth.uid()
+    )
+)
+WITH CHECK (
+    categories.household_id IS NOT NULL
+    AND EXISTS (
+        SELECT 1 FROM household_members
+        WHERE household_id = categories.household_id
+        AND user_id = auth.uid()
+    )
+);
+
+CREATE POLICY "Users can delete categories in their households"
+ON categories
+FOR DELETE
+USING (
+    categories.household_id IS NOT NULL
+    AND EXISTS (
         SELECT 1 FROM household_members
         WHERE household_id = categories.household_id
         AND user_id = auth.uid()
