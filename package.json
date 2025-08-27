@@ -1,6 +1,7 @@
 {
   "dependencies": {
     "@supabase/supabase-js": "^2.53.0",
-    "nanoid": "^5.1.5"
+    "nanoid": "^5.1.5",
+    "react-hook-form": "^7.62.0"
   }
 }
