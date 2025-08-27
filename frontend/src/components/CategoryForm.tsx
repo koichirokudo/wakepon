@@ -1,22 +1,59 @@
 // src/components/CategoryForm.tsx
-import type { CategoryInput } from '../types';
+import { useEffect } from 'react';
+import { useForm } from 'react-hook-form';
+import type { Category, CategoryInput } from '../types';
 
 type CategoryFormProps = {
-  values: CategoryInput;
+  categoryToEdit?: Category;            // 編集対象カテゴリ
   editing?: boolean;
-  onChange: (values: CategoryInput) => void;
-  onSubmit: () => void;
+  onSubmit: (data: CategoryInput) => void;
   onCancel?: () => void;
 }
 
-export default function CategoryForm({ values, editing = false, onChange, onSubmit, onCancel }: CategoryFormProps) {
+export default function CategoryForm({ categoryToEdit, editing = false, onSubmit, onCancel }: CategoryFormProps) {
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    watch,
+    reset,
+    formState: { errors },
+  } = useForm<CategoryInput>({
+    defaultValues: { name: "" }
+  });
+
+  console.log(watch("name"));
+
+  // 編集開始時にフォームに値をセット
+  useEffect(() => {
+    if (editing && categoryToEdit) {
+      setValue('name', categoryToEdit.name || '');
+    } else {
+      reset();
+    }
+  }, [editing, categoryToEdit, setValue, reset]);
+
+  const handleCancel = () => {
+    reset();
+    onCancel?.();
+  };
+
+
   return (
-    <form onSubmit={(e) => { e.preventDefault(); onSubmit(); }}>
-      <input type="text" value={values.name} placeholder="カテゴリ名" maxLength={10} onChange={(e) => onChange({ ...values, name: e.target.value })} required /><br /><br />
+    <form onSubmit={handleSubmit(onSubmit)}>
+      <input
+        {...register("name", {
+          required: "必須項目です",
+          maxLength: { value: 10, message: "10文字以内で入力してください" }
+        })}
+        placeholder="カテゴリ名"
+      />
+      {errors.name && <p style={{ color: 'red' }}>{errors.name.message}</p>}
+      <br /><br />
       {editing ? (
         <>
           <button type="submit">保存</button>
-          <button type="button" onClick={onCancel}>キャンセル</button>
+          <button type="button" onClick={handleCancel}>キャンセル</button>
         </>
       ) : (
         <button type="submit">追加</button>

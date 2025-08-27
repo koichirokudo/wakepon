@@ -10,7 +10,6 @@ export default function Categories() {
   const { user, member } = useAuth();
   const [categories, setCategories] = useState<Category[]>([]);
   const [editingCategoryId, setEditingCategoryId] = useState<string | null>(null);
-  const [name, setName] = useState<string>('');
 
   // 共通エラー処理
   const handleError = (msg: string, error: any) => {
@@ -35,12 +34,10 @@ export default function Categories() {
 
   const startEditCategory = (category: Category) => {
     setEditingCategoryId(category.id);
-    setName(category.name || '');
   };
 
   const cancelEdit = () => {
     setEditingCategoryId(null);
-    setName('');
   }
 
   // カテゴリ追加
@@ -66,7 +63,7 @@ export default function Categories() {
     }
   }
 
-  const handleUpdateCategory = async () => {
+  const handleUpdateCategory = async (category: CategoryInput) => {
     if (!editingCategoryId) return;
 
     if (!user || !member) {
@@ -77,7 +74,7 @@ export default function Categories() {
     const { data, error } = await supabase
       .from('categories')
       .update({
-        name: name
+        name: category.name,
       })
       .eq('id', editingCategoryId)
       .select()
@@ -114,17 +111,22 @@ export default function Categories() {
     }
   }
 
+  const categoryToEdit = categories.find(c => c.id === editingCategoryId);
+
   return (
     <div>
       <h1>カテゴリ一覧</h1>
       <CategoryList categories={categories} onEdit={startEditCategory} onDelete={handleDeleteCategory} />
-      <h1>カテゴリ編集</h1>
+      <h1>{editingCategoryId ? 'カテゴリ編集' : 'カテゴリ追加'}</h1>
       <CategoryForm
-        values={{ name }}
+        categoryToEdit={categoryToEdit}
         editing={!!editingCategoryId}
-        onSubmit={editingCategoryId ? handleUpdateCategory : () => handleAddCategory({ name })}
-        onChange={({ name }) => {
-          setName(name);
+        onSubmit={(data) => {
+          if (editingCategoryId) {
+            handleUpdateCategory(data);
+          } else {
+            handleAddCategory(data);
+          }
         }}
         onCancel={cancelEdit}
       />
