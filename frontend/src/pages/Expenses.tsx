@@ -14,12 +14,6 @@ export default function Expenses() {
   const [expensesCache, setExpensesCache] = useState<Record<string, Expense[]>>({});
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
-  const [date, setDate] = useState('');
-  const [amount, setAmount] = useState('');
-  const [categoryId, setCategoryId] = useState('');
-  const [paymentMethodId, setPaymentMethodId] = useState('');
-  const [memo, setMemo] = useState('');
-
   const [categories, setCategories] = useState<{ id: string; name: string }[]>([]);
   const [paymentMethods, setPaymentMethods] = useState<{ id: string; name: string }[]>([]);
   const [editingExpenseId, setEditingExpenseId] = useState<string | null>(null);
@@ -172,19 +166,10 @@ export default function Expenses() {
   // 編集開始・キャンセル
   const startEditExpense = (expense: Expense) => {
     setEditingExpenseId(expense.id);
-    setDate(expense.date.slice(0, 10));
-    setAmount(expense.amount.toString());
-    setCategoryId(expense.category.id);
-    setPaymentMethodId(expense.paymentMethod.id);
-    setMemo(expense.memo || '');
   };
+
   const cancelEdit = () => {
     setEditingExpenseId(null);
-    setDate('');
-    setAmount('');
-    setCategoryId('');
-    setPaymentMethodId('');
-    setMemo('');
   };
 
   // 支出追加
@@ -205,8 +190,8 @@ export default function Expenses() {
       .insert({
         household_id: member?.household_id,
         user_id: user?.id,
-        amount: parseFloat(expense.amount),
         date: expense.date,
+        amount: amt,
         category_id: expense.categoryId,
         payment_method_id: expense.paymentMethodId,
         memo: expense.memo
@@ -236,7 +221,7 @@ export default function Expenses() {
   };
 
   // 支出更新
-  const handleUpdateExpense = async () => {
+  const handleUpdateExpense = async (expense: ExpenseInput) => {
     if (!editingExpenseId) return;
 
     if (!user || !member) {
@@ -244,7 +229,7 @@ export default function Expenses() {
       return;
     };
 
-    const amt = parseFloat(amount);
+    const amt = parseFloat(expense.amount);
     if (Number.isNaN(amt) || amt <= 0) {
       handleError('金額が不正です', null);
       return;
@@ -253,11 +238,11 @@ export default function Expenses() {
     const { data, error } = await supabase
       .from('expenses')
       .update({
-        date,
+        date: expense.date,
         amount: amt,
-        category_id: categoryId,
-        payment_method_id: paymentMethodId,
-        memo,
+        category_id: expense.categoryId,
+        payment_method_id: expense.paymentMethodId,
+        memo: expense.memo,
       })
       .eq('id', editingExpenseId)
       .select(`id, date, amount, memo, categories(id, name), payment_methods(id, name)`)
@@ -302,22 +287,23 @@ export default function Expenses() {
     }
   };
 
+  const expenseToEdit = expenses.find(e => e.id === editingExpenseId);
+
   return (
     <>
       <div>
         <h1>支出入力</h1>
         <ExpenseForm
+          expenseToEdit={expenseToEdit}
           categories={categories}
           paymentMethods={paymentMethods}
-          values={{ date, amount, categoryId, paymentMethodId, memo }}
           editing={!!editingExpenseId}
-          onSubmit={editingExpenseId ? handleUpdateExpense : () => handleAddExpense({ date, amount, categoryId, paymentMethodId, memo })}
-          onChange={({ date, amount, categoryId, paymentMethodId, memo }) => {
-            setDate(date);
-            setAmount(amount);
-            setCategoryId(categoryId);
-            setPaymentMethodId(paymentMethodId);
-            setMemo(memo ?? '');
+          onSubmit={(data) => {
+            if (editingExpenseId) {
+              handleUpdateExpense(data);
+            } else {
+              handleAddExpense(data);
+            }
           }}
           onCancel={cancelEdit}
         />

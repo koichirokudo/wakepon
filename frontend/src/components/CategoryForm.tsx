@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form';
 import type { Category, CategoryInput } from '../types';
 
 type CategoryFormProps = {
-  categoryToEdit?: Category;            // 編集対象カテゴリ
+  categoryToEdit?: Category;
   editing?: boolean;
   onSubmit: (data: CategoryInput) => void;
   onCancel?: () => void;
@@ -27,7 +27,7 @@ export default function CategoryForm({ categoryToEdit, editing = false, onSubmit
   // 編集開始時にフォームに値をセット
   useEffect(() => {
     if (editing && categoryToEdit) {
-      setValue('name', categoryToEdit.name || '');
+      setValue('name', categoryToEdit.name || "");
     } else {
       reset();
     }
@@ -43,7 +43,7 @@ export default function CategoryForm({ categoryToEdit, editing = false, onSubmit
     <form onSubmit={handleSubmit(onSubmit)}>
       <input
         {...register("name", {
-          required: "必須項目です",
+          required: "カテゴリ名を入力してください",
           maxLength: { value: 10, message: "10文字以内で入力してください" }
         })}
         placeholder="カテゴリ名"
