@@ -1,27 +1,33 @@
 // src/pages/SignIn.tsx
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useForm } from 'react-hook-form';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { useSearchParams } from 'react-router-dom';
+import type { SigninInput } from '../types';
 
 export default function SignIn() {
   const { signin } = useAuth();
-  const [email, setEmail] = useState<string>('');
-  const [message, setMessage] = useState<string>('');
+  const { register, handleSubmit, formState: { errors } } = useForm<SigninInput>({
+    defaultValues: { email: "" }
+  });
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const inviteCode = searchParams.get('invite_code');
 
-  const handleSignIn = async () => {
+  const onSignin = async (data: SigninInput) => {
     setIsLoading(true);
-    setMessage('');
+    const email = data.email;
 
     try {
       const { error } = await signin(email);
 
       if (!error) {
-        navigate(`/verify-otp?invite_code=${inviteCode}`, { state: { email } });
+        if (inviteCode) {
+          navigate(`/verify-otp?invite_code=${inviteCode}`, { state: { email } });
+        } else {
+          navigate(`/verify-otp`, { state: { email } });
+        }
       }
 
     } catch (error) {
@@ -34,11 +40,20 @@ export default function SignIn() {
   return (
     <div>
       <h1>ログイン</h1>
-      <form onSubmit={(e) => e.preventDefault()}>
-        <input type="email" placeholder="メールアドレス" value={email} onChange={(e) => setEmail(e.target.value)} required /><br />
-        <input type="button" value="ログインする" onClick={handleSignIn} /><br />
+      <form onSubmit={handleSubmit(onSignin)}>
+        <input
+          {...register("email", {
+            required: "メールアドレスを入力してください",
+            pattern: {
+              value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+              message: "正しいメールアドレスを入力してください"
+            }
+          })}
+          placeholder="メールアドレス"
+        /><br />
+        <button type="submit">ログインする</button>
         {isLoading && <p>ログイン中...</p>}
-        {message && <p>{message}</p>}
+        {errors.email && <p style={{ color: 'red' }}>{errors.email.message}</p>}
       </form>
     </div>
   );

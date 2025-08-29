@@ -54,3 +54,7 @@ export type Invite = {
   email: string;
 };
 
+export type SigninInput = {
+  email: string;
+}
+
