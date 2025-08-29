@@ -15,9 +15,9 @@ export type Member = {
 
 export type Expense = {
   id: string;
-  date: string;
+  date: string; // ISO日付文字列
   amount: number;
-  users: { name: string };
+  users: { name: string } | null;
   category: { id: string; name: string };
   paymentMethod: { id: string; name: string };
   memo?: string;
@@ -25,7 +25,7 @@ export type Expense = {
 
 export type ExpenseInput = {
   date: string;
-  amount: string;
+  amount: string; // フォームでは文字列
   categoryId: string;
   paymentMethodId: string;
   memo?: string;
@@ -39,7 +39,7 @@ export type Settlement = {
 
 export type Category = {
   id: string;
-  household_id: string;
+  household_id: string | null; // 共通カテゴリの場合 null
   name: string;
   is_custom: boolean;
   created_at: Date;
@@ -58,3 +58,14 @@ export type SigninInput = {
   email: string;
 }
 
+export type ApiResponse<T> = {
+  success: boolean;
+  data?: T;
+  error?: string;
+}
+
+// フォームバリデーション用の型
+export type ValidationError = {
+  field: string;
+  message: string;
+};

@@ -2,6 +2,7 @@
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import type { Category, CategoryInput } from '../types';
+import { validationRules } from '../utils/validation';
 
 type CategoryFormProps = {
   categoryToEdit?: Category;
@@ -42,10 +43,7 @@ export default function CategoryForm({ categoryToEdit, editing = false, onSubmit
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <input
-        {...register("name", {
-          required: "カテゴリ名を入力してください",
-          maxLength: { value: 10, message: "10文字以内で入力してください" }
-        })}
+        {...register("name", validationRules.categoryName)}
         placeholder="カテゴリ名"
       />
       {errors.name && <p style={{ color: 'red' }}>{errors.name.message}</p>}

@@ -4,6 +4,7 @@ import { useForm } from 'react-hook-form';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import type { SigninInput } from '../types';
+import { validationRules } from '../utils/validation';
 
 export default function SignIn() {
   const { signin } = useAuth();
@@ -42,13 +43,7 @@ export default function SignIn() {
       <h1>ログイン</h1>
       <form onSubmit={handleSubmit(onSignin)}>
         <input
-          {...register("email", {
-            required: "メールアドレスを入力してください",
-            pattern: {
-              value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
-              message: "正しいメールアドレスを入力してください"
-            }
-          })}
+          {...register("email", validationRules.email)}
           placeholder="メールアドレス"
         /><br />
         <button type="submit">ログインする</button>
