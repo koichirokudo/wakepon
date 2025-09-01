@@ -31,6 +31,28 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+-- 自分自身、または同じ household に属している人しか見えない
+CREATE POLICY "Users can view members of same household" ON users
+FOR SELECT USING (
+    id = auth.uid() OR
+    EXISTS (
+        SELECT 1 FROM household_members hm1
+        JOIN household_members hm2 ON hm1.household_id = hm2.household_id
+        WHERE hm1.user_id = auth.uid()
+        AND hm2.user_id = users.id
+    )
+);
+
+-- ログインユーザーが household_members に登録されている household しか見えない
+CREATE POLICY "Users can view only their households" ON households
+FOR SELECT USING (
+    EXISTS (
+        SELECT 1 FROM household_members
+        WHERE household_id = households.id
+        AND user_id = auth.uid()
+    )
+);
+
 -- トリガーを household_members テーブルに設定
 CREATE TRIGGER set_timestamp
 BEFORE INSERT OR UPDATE ON household_members

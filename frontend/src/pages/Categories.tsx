@@ -1,135 +1,86 @@
 // src/pages/Categories.tsx
 import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabaseClient';
-import type { Category, CategoryInput } from '../types';
+import type { Category } from '../types';
 import { useAuth } from '../contexts/AuthContext';
 import CategoryList from '../components/CategoryList';
-import CategoryForm from '../components/CategoryForm';
+import SelectCategoryForm from '../components/SelectCategoryForm';
 
 export default function Categories() {
-  const { user, member } = useAuth();
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [editingCategoryId, setEditingCategoryId] = useState<string | null>(null);
+  const { member } = useAuth();
+  const [categories, setCategories] = useState<Category[]>([]); // 全カテゴリ
+  const [enableCategoryIds, setEnableCategoryIds] = useState<string[]>([]); // 使用中カテゴリ
 
   // 共通エラー処理
   const handleError = (msg: string, error: any) => {
     console.error(`${msg}:`, error?.message ?? error);
   };
 
+  // カテゴリ取得
   const fetchCategories = async () => {
-    const { data, error } = await supabase
+    if (!member) return;
+
+    // 全カテゴリ取得（共通 + カスタム)
+    const { data: catData, error: catError } = await supabase
       .from('categories')
-      .select()
-      .or(`household_id.eq.${member?.household_id}, is_custom.eq.false`);
-    if (error) {
-      console.error(error);
-    } else {
-      setCategories(data);
-    }
+      .select();
+    if (catError) return handleError("カテゴリ取得失敗", catError);
+
+    setCategories(catData);
+
+    // 世帯ごとのカテゴリ情報を取得
+    const { data: hcData, error: hcError } = await supabase
+      .from('household_categories')
+      .select('category_id')
+      .eq('household_id', member?.household_id);
+    if (hcError) return handleError("世帯カテゴリ取得失敗", hcError);
+
+    setEnableCategoryIds(hcData.map((hc) => hc.category_id))
   }
 
   useEffect(() => {
     fetchCategories();
-  }, []);
+  }, [member]);
 
-  const startEditCategory = (category: Category) => {
-    setEditingCategoryId(category.id);
-  };
+  // カテゴリ選択による追加と削除の処理
+  const handleSelectCategory = async (toAdd: string[], toRemove: string[]) => {
+    if (!member) return;
 
-  const cancelEdit = () => {
-    setEditingCategoryId(null);
-  }
-
-  // カテゴリ追加
-  const handleAddCategory = async (category: CategoryInput) => {
-    if (!user || !member) {
-      handleError('グループIDまたはユーザーIDが設定されていません', null);
-      return;
-    };
-
-    const { data, error } = await supabase
-      .from('categories')
-      .insert({
-        household_id: member?.household_id,
-        name: category.name,
-        is_custom: true,
-      })
-      .select();
-    if (error) {
-      handleError('カテゴリ追加失敗', error);
-    } else if (data) {
-      console.log('カテゴリ追加成功');
-      fetchCategories()
-    }
-  }
-
-  const handleUpdateCategory = async (category: CategoryInput) => {
-    if (!editingCategoryId) return;
-
-    if (!user || !member) {
-      handleError('グループIDまたはユーザーIDが設定されていません', null);
-      return;
-    };
-
-    const { data, error } = await supabase
-      .from('categories')
-      .update({
-        name: category.name,
-      })
-      .eq('id', editingCategoryId)
-      .select()
-      .single();
-    if (error) {
-      handleError('カテゴリ更新失敗', error);
-    } else if (data) {
-      console.log('カテゴリ更新成功')
-      setCategories(prev => {
-        const updated = prev.map(cat => cat.id === editingCategoryId ? {
-          ...cat,
-          name: data.name,
-        }
-          : cat
+    // 追加
+    if (toAdd.length > 0) {
+      const { error } = await supabase
+        .from('household_categories')
+        .insert(
+          toAdd.map(category_id => ({
+            household_id: member.household_id,
+            category_id,
+          }))
         );
-        return updated;
-      })
+      if (error) handleError("カテゴリ追加失敗", error);
     }
-  }
 
-
-  // カテゴリ削除
-  const handleDeleteCategory = async (id: string) => {
-    if (!confirm('本当に削除しますか？')) return;
-
-    const { error } = await supabase.from('categories').delete().eq('id', id);
-    if (error) {
-      handleError('カテゴリ削除失敗', error);
-    } else {
-      setCategories(prev => {
-        const updated = prev.filter(c => c.id !== id);
-        return updated;
-      });
+    // 削除
+    if (toRemove.length > 0) {
+      const { error } = await supabase
+        .from('household_categories')
+        .delete()
+        .eq('household_id', member.household_id)
+        .in('category_id', toRemove);
+      if (error) handleError("カテゴリ削除失敗", error);
     }
-  }
 
-  const categoryToEdit = categories.find(c => c.id === editingCategoryId);
+    // データを最新に更新
+    fetchCategories();
+  }
 
   return (
     <div>
-      <h1>カテゴリ一覧</h1>
-      <CategoryList categories={categories} onEdit={startEditCategory} onDelete={handleDeleteCategory} />
-      <h1>{editingCategoryId ? 'カテゴリ編集' : 'カテゴリ追加'}</h1>
-      <CategoryForm
-        categoryToEdit={categoryToEdit}
-        editing={!!editingCategoryId}
-        onSubmit={(data) => {
-          if (editingCategoryId) {
-            handleUpdateCategory(data);
-          } else {
-            handleAddCategory(data);
-          }
-        }}
-        onCancel={cancelEdit}
-      />
+      <h1>使用中のカテゴリ一覧</h1>
+      <CategoryList categories={categories.filter(c => enableCategoryIds.includes(c.id))} />
+
+      <h1>カテゴリ選択</h1>
+      <SelectCategoryForm categories={categories} enableCategoryIds={enableCategoryIds} onSubmit={handleSelectCategory} />
     </div>
   );
 }
+

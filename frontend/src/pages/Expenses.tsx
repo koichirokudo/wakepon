@@ -92,14 +92,19 @@ export default function Expenses() {
 
     const fetchCategories = async () => {
       const { data, error } = await supabase
-        .from('categories')
-        .select()
-        .or(`household_id.eq.${member?.household_id},is_custom.eq.false`);
-
+        .from('household_categories')
+        .select(`
+          categories (
+            id,
+            name
+          )
+        `)
+        .eq('household_id', member.household_id);
       if (error) {
         handleError('カテゴリ取得失敗', error);
       } else {
-        setCategories(data || []);
+        const cat = data?.flatMap((d) => d.categories);
+        setCategories(cat);
       }
     };
     fetchCategories();

@@ -39,15 +39,26 @@ export type Settlement = {
 
 export type Category = {
   id: string;
-  household_id: string | null; // 共通カテゴリの場合 null
   name: string;
   is_custom: boolean;
   created_at: Date;
   updated_at: Date;
 };
 
-export type CategoryInput = {
+export type CategoryInsert = {
+  id: string;
   name: string;
+};
+export type HouseHoldCategory = {
+  id: string;
+  household_id: string;
+  category_id: string;
+  is_custom: boolean;
+};
+
+export type HouseholdCategoryInsert = {
+  household_id: string;
+  category_id: string;
 };
 
 export type Invite = {

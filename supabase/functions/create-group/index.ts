@@ -25,19 +25,25 @@ Deno.serve(async (req) => {
 
   console.log("Received data:", data);
   try {
-    // Supabaseクライアントの初期化
-    const supabaseClient = createClient(
+    // ユーザー確認用クライアント（JWT + anon key）
+    const supabaseUser = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
       Deno.env.get("SUPABASE_ANON_KEY") ?? "",
       { global: { headers: { Authorization: `Bearer ${token}` } } }
     );
 
+    // 管理者用クライアント（service_role, RLS無視）
+    const supabaseAdmin = createClient(
+      Deno.env.get("SUPABASE_URL") ?? "",
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
+    );
+
     // ユーザーの認証情報を取得
-    const { data: authData, error: authError } = await supabaseClient.auth.getUser();
+    const { data: authData, error: authError } = await supabaseUser.auth.getUser();
     if (authError || !authData?.user) throw new Error("User not authenticated");
 
     // users テーブルの情報を取得
-    const { data: userData, error: userError } = await supabaseClient
+    const { data: userData, error: userError } = await supabaseAdmin
     .from('users')
     .select()
     .eq('id', userId)
@@ -45,7 +51,7 @@ Deno.serve(async (req) => {
     console.log(userData);
 
     // householdテーブルに新しいグループを作成
-    const { data: householdData, error: householdError } = await supabaseClient
+    const { data: householdData, error: householdError } = await supabaseAdmin
     .from('households').insert({ name: userData.name + "のグループ" })
     .select().single();
 
@@ -55,7 +61,7 @@ Deno.serve(async (req) => {
 
 
     // household_membersテーブルにユーザーを追加
-    const { error: insertError } = await supabaseClient.from('household_members').insert({
+    const { error: insertError } = await supabaseAdmin.from('household_members').insert({
       user_id: userId,
       household_id: householdData.id,
     });

@@ -1,71 +1,16 @@
 CREATE TABLE categories (
     id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-    household_id uuid REFERENCES households(id),
     name TEXT NOT NULL,
-    is_custom BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL,
     updated_at TIMESTAMP WITH TIME ZONE NOT NULL
 );
 
 ALTER TABLE categories ENABLE ROW LEVEL SECURITY;
--- household内で同名になってはいけない
-ALTER TABLE categories
-    ADD CONSTRAINT unique_category_name_per_household UNIQUE (household_id, name);
 
-CREATE POLICY "Users can view categories in their households"
+-- 共通カテゴリは全員参照可能
+CREATE POLICY "Allow all to select categories"
 ON categories FOR SELECT
-USING (
-    categories.household_id IS NULL OR
-    EXISTS (
-        SELECT 1 FROM household_members
-        WHERE household_id = categories.household_id
-        AND user_id = auth.uid()
-    )
-);
-
-CREATE POLICY "Users can insert categories in their households"
-ON categories
-FOR INSERT
-WITH CHECK (
-    categories.household_id IS NOT NULL
-    AND EXISTS (
-        SELECT 1 FROM household_members
-        WHERE household_id = categories.household_id
-        AND user_id = auth.uid()
-    )
-);
-
-CREATE POLICY "Users can update categories in their households"
-ON categories 
-FOR UPDATE 
-USING (
-    categories.household_id IS NOT NULL
-    AND EXISTS (
-        SELECT 1 FROM household_members
-        WHERE household_id = categories.household_id
-        AND user_id = auth.uid()
-    )
-)
-WITH CHECK (
-    categories.household_id IS NOT NULL
-    AND EXISTS (
-        SELECT 1 FROM household_members
-        WHERE household_id = categories.household_id
-        AND user_id = auth.uid()
-    )
-);
-
-CREATE POLICY "Users can delete categories in their households"
-ON categories
-FOR DELETE
-USING (
-    categories.household_id IS NOT NULL
-    AND EXISTS (
-        SELECT 1 FROM household_members
-        WHERE household_id = categories.household_id
-        AND user_id = auth.uid()
-    )
-);
+USING (true);
 
 -- updated_at を自動更新するトリガー
 CREATE OR REPLACE FUNCTION update_timestamp()

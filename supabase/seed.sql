@@ -27,14 +27,12 @@ VALUES
 
 -- ここはカテゴリIDや支払方法IDをselectして一時変数に入れるか、先に固定IDで入れておく必要あり
 -- 本格的に作るなら WITH句や CTEを使ってもOK
--- カテゴリ（共通・カスタム）
-INSERT INTO categories (id, household_id, name, is_custom, created_at, updated_at) VALUES (gen_random_uuid(), NULL, '食費', false, '2025-08-06T03:05:13.418225', '2025-08-06T03:05:13.418225');
-INSERT INTO categories (id, household_id, name, is_custom, created_at, updated_at) VALUES (gen_random_uuid(), NULL, '日用品', false, '2025-08-06T03:05:13.418225', '2025-08-06T03:05:13.418225');
-INSERT INTO categories (id, household_id, name, is_custom, created_at, updated_at) VALUES (gen_random_uuid(), NULL, '水道', false, '2025-08-06T03:05:13.418225', '2025-08-06T03:05:13.418225');
-INSERT INTO categories (id, household_id, name, is_custom, created_at, updated_at) VALUES (gen_random_uuid(), NULL, '電気', false, '2025-08-06T03:05:13.418225', '2025-08-06T03:05:13.418225');
-INSERT INTO categories (id, household_id, name, is_custom, created_at, updated_at) VALUES (gen_random_uuid(), NULL, 'ガス', false, '2025-08-06T03:05:13.418225', '2025-08-06T03:05:13.418225');
 
--- household専用カテゴリ（カスタム）
-INSERT INTO categories (id, household_id, name, is_custom, created_at, updated_at)
-VALUES
-  (gen_random_uuid(), '10000000-0000-0000-0000-000000000001', '猫用品', true, now(), now());
+-- カテゴリ（共通）
+INSERT INTO categories (id, name, created_at, updated_at) VALUES (gen_random_uuid(), '食費', '2025-08-06T03:05:13.418225', '2025-08-06T03:05:13.418225');
+INSERT INTO categories (id, name, created_at, updated_at) VALUES (gen_random_uuid(), '日用品','2025-08-06T03:05:13.418225', '2025-08-06T03:05:13.418225');
+INSERT INTO categories (id, name, created_at, updated_at) VALUES (gen_random_uuid(), '水道', '2025-08-06T03:05:13.418225', '2025-08-06T03:05:13.418225');
+INSERT INTO categories (id, name, created_at, updated_at) VALUES (gen_random_uuid(), '電気', '2025-08-06T03:05:13.418225', '2025-08-06T03:05:13.418225');
+INSERT INTO categories (id, name, created_at, updated_at) VALUES (gen_random_uuid(), 'ガス', '2025-08-06T03:05:13.418225', '2025-08-06T03:05:13.418225');
+INSERT INTO categories (id, name, created_at, updated_at) VALUES (gen_random_uuid(), '娯楽', '2025-08-06T03:05:13.418225', '2025-08-06T03:05:13.418225');
+INSERT INTO categories (id, name, created_at, updated_at) VALUES (gen_random_uuid(), '交通費','2025-08-06T03:05:13.418225', '2025-08-06T03:05:13.418225');
