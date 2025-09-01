@@ -308,6 +308,10 @@ export default function Expenses() {
           onCancel={cancelEdit}
         />
       </div>
+      <div>
+        <h1>支出集計</h1>
+        <ExpenseSummary selectedMonth={selectedMonth} totalAmount={totalAmount} paidByUser={paidByUser} settlements={settlements} />
+      </div>
 
       <div>
         <h1>支出一覧</h1>
@@ -319,10 +323,6 @@ export default function Expenses() {
         {isLoading ? <p>読み込み中...</p> : <ExpenseList expenses={expenses} onEdit={startEditExpense} onDelete={handleDeleteExpense} />}
       </div>
 
-      <div>
-        <h1>支出集計</h1>
-        <ExpenseSummary selectedMonth={selectedMonth} totalAmount={totalAmount} paidByUser={paidByUser} settlements={settlements} />
-      </div>
     </>
   );
 }
