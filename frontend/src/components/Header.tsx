@@ -15,6 +15,7 @@ export default function Header() {
       {user?.id ? (
         <div>
           <nav>
+            <Link to="/">ホーム</Link>
             <Link to="/expenses">支払一覧</Link>
             <Link to="/categories">カテゴリ一覧</Link>
             <Link to="/invite">ユーザー招待</Link>
