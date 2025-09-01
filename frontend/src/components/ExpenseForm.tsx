@@ -7,15 +7,13 @@ import type { Expense, ExpenseInput } from '../types';
 type ExpenseFormProps = {
   expenseToEdit?: Expense;
   categories: { id: string; name: string }[];
-  paymentMethods: { id: string; name: string }[];
   editing?: boolean;
   onSubmit: (data: ExpenseInput) => void;
   onCancel?: () => void;
 };
 
-export default function ExpenseForm({ expenseToEdit, categories, paymentMethods, editing = false, onSubmit, onCancel }: ExpenseFormProps) {
+export default function ExpenseForm({ expenseToEdit, categories, editing = false, onSubmit, onCancel }: ExpenseFormProps) {
   const defaultCategory = categories?.find((c) => c.name === "食費");
-  const defaultPaymentMethod = paymentMethods?.find((p) => p.name === "現金");
   const {
     register,
     handleSubmit,
@@ -27,23 +25,21 @@ export default function ExpenseForm({ expenseToEdit, categories, paymentMethods,
       date: new Date().toISOString().split("T")[0],
       amount: "",
       categoryId: "",
-      paymentMethodId: "",
       memo: "",
     }
   });
 
   // 非同期処理で取得したデータを初期値にセット
   useEffect(() => {
-    if (defaultCategory && defaultPaymentMethod) {
+    if (defaultCategory) {
       reset({
         date: new Date().toISOString().split("T")[0],
         amount: "",
         categoryId: defaultCategory.id,
-        paymentMethodId: defaultPaymentMethod.id,
         memo: ""
       });
     }
-  }, [defaultCategory, defaultPaymentMethod, reset]);
+  }, [defaultCategory, reset]);
 
   // 編集開始時にフォームにセット
   useEffect(() => {
@@ -55,7 +51,6 @@ export default function ExpenseForm({ expenseToEdit, categories, paymentMethods,
       setValue("date", dateStr)
       setValue("amount", expenseToEdit.amount.toString() || "");
       setValue("categoryId", expenseToEdit.category.id || "");
-      setValue("paymentMethodId", expenseToEdit.paymentMethod.id || "");
       setValue("memo", expenseToEdit.memo || "");
     }
   })
@@ -87,14 +82,6 @@ export default function ExpenseForm({ expenseToEdit, categories, paymentMethods,
         ))}
       </select><br />
       {errors.categoryId && <p style={{ color: 'red' }}>{errors.categoryId.message}</p>}
-      {/* 支払方法 */}
-      <select {...register("paymentMethodId")}>
-        <option value="">支払い方法を選択</option>
-        {paymentMethods.map((pm) => (
-          <option key={pm.id} value={pm.id}>{pm.name}</option>
-        ))}
-      </select><br />
-      {errors.paymentMethodId && <p style={{ color: 'red' }}>{errors.paymentMethodId.message}</p>}
       {/* メモ */}
       <input {
         ...register("memo", validationRules.memo)}

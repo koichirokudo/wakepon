@@ -5,7 +5,6 @@ CREATE TABLE expenses (
     date TIMESTAMP WITH TIME ZONE NOT NULL,
     amount integer NOT NULL DEFAULT 0,
     category_id uuid NOT NULL REFERENCES categories(id),
-    payment_method_id uuid NOT NULL REFERENCES payment_methods(id),
     memo TEXT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL,
     updated_at TIMESTAMP WITH TIME ZONE NOT NULL

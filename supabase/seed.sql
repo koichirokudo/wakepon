@@ -15,13 +15,6 @@ VALUES
   (gen_random_uuid(), '10000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000001', now(), now()),
   (gen_random_uuid(), '10000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000002', now(), now());
 
--- 共通支払方法
-INSERT INTO payment_methods (id, name, created_at, updated_at)
-VALUES
-  (gen_random_uuid(), '現金', now(), now()),
-  (gen_random_uuid(), 'クレジットカード', now(), now()),
-  (gen_random_uuid(), 'PayPay', now(), now());
-
 -- expenses（仮にすべての参照IDを上から取得した場合）
 -- ※ 実際には、insert後にIDを取得して使うか、定数IDで管理することを推奨
 

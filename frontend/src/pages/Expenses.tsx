@@ -15,7 +15,6 @@ export default function Expenses() {
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   const [categories, setCategories] = useState<{ id: string; name: string }[]>([]);
-  const [paymentMethods, setPaymentMethods] = useState<{ id: string; name: string }[]>([]);
   const [editingExpenseId, setEditingExpenseId] = useState<string | null>(null);
 
   const [selectedMonth, setSelectedMonth] = useState<string>(() => {
@@ -59,7 +58,7 @@ export default function Expenses() {
 
       const { data, error } = await supabase
         .from('expenses')
-        .select(`id, date, amount, memo, users(name), categories(id, name), payment_methods(id, name)`)
+        .select(`id, date, amount, memo, users(name), categories(id, name)`)
         .gte('date', startDate)
         .lt('date', endDate)
         .order('date', { ascending: false });
@@ -74,7 +73,6 @@ export default function Expenses() {
           memo: item.memo,
           users: item.users,
           category: item.categories,
-          paymentMethod: item.payment_methods,
         }));
 
         setExpensesCache(prev => ({ ...prev, [selectedMonth]: mapped }));
@@ -109,19 +107,6 @@ export default function Expenses() {
     };
     fetchCategories();
   }, [member?.household_id]);
-
-  // 支払い方法取得
-  useEffect(() => {
-    const fetchPaymentMethods = async () => {
-      const { data, error } = await supabase.from('payment_methods').select('*');
-      if (error) {
-        handleError('支払い方法取得失敗', error);
-      } else {
-        setPaymentMethods(data || []);
-      }
-    };
-    fetchPaymentMethods();
-  }, []);
 
   // 月の総支出額
   const totalAmount = useMemo(() => expenses.reduce((sum, e) => sum + e.amount, 0), [expenses]);
@@ -198,10 +183,9 @@ export default function Expenses() {
         date: expense.date,
         amount: amt,
         category_id: expense.categoryId,
-        payment_method_id: expense.paymentMethodId,
         memo: expense.memo
       })
-      .select(`id, date, amount, memo, categories(id, name), payment_methods(id, name)`)
+      .select(`id, date, amount, memo, categories(id, name)`)
       .single();
 
     if (error) handleError('支出追加失敗', error);
@@ -213,7 +197,6 @@ export default function Expenses() {
         memo: data.memo,
         users: { name: user.name ?? '不明' },
         category: Array.isArray(data.categories) ? data.categories[0] : data.categories,
-        paymentMethod: Array.isArray(data.payment_methods) ? data.payment_methods[0] : data.payment_methods,
       };
 
       setExpenses(prev => {
@@ -246,11 +229,10 @@ export default function Expenses() {
         date: expense.date,
         amount: amt,
         category_id: expense.categoryId,
-        payment_method_id: expense.paymentMethodId,
         memo: expense.memo,
       })
       .eq('id', editingExpenseId)
-      .select(`id, date, amount, memo, categories(id, name), payment_methods(id, name)`)
+      .select(`id, date, amount, memo, categories(id, name)`)
       .single();
 
     if (error) {
@@ -265,7 +247,6 @@ export default function Expenses() {
               amount: data.amount,
               memo: data.memo,
               category: Array.isArray(data.categories) ? data.categories[0] : data.categories,
-              paymentMethod: Array.isArray(data.payment_methods) ? data.payment_methods[0] : data.payment_methods
             }
             : exp
         );
@@ -301,7 +282,6 @@ export default function Expenses() {
         <ExpenseForm
           expenseToEdit={expenseToEdit}
           categories={categories}
-          paymentMethods={paymentMethods}
           editing={!!editingExpenseId}
           onSubmit={(data) => {
             if (editingExpenseId) {

@@ -19,7 +19,6 @@ export type Expense = {
   amount: number;
   users: { name: string } | null;
   category: { id: string; name: string };
-  paymentMethod: { id: string; name: string };
   memo?: string;
 };
 
@@ -27,7 +26,6 @@ export type ExpenseInput = {
   date: string;
   amount: string; // フォームでは文字列
   categoryId: string;
-  paymentMethodId: string;
   memo?: string;
 };
 

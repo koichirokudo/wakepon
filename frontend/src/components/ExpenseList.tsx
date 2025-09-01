@@ -14,7 +14,6 @@ export default function ExpenseList({ expenses, onEdit, onDelete }: ExpenseListP
           <th>日付</th>
           <th>カテゴリ</th>
           <th style={{ textAlign: "right" }}>金額</th>
-          <th>支払い方法</th>
           <th>メモ</th>
           <th>ユーザー</th>
           <th>操作</th>
@@ -26,7 +25,6 @@ export default function ExpenseList({ expenses, onEdit, onDelete }: ExpenseListP
             <td>{new Date(expense.date).toLocaleDateString("ja-JP")}</td>
             <td>{expense.category?.name}</td>
             <td style={{ textAlign: "right" }}>{expense.amount.toLocaleString()}円</td>
-            <td>{expense.paymentMethod?.name}</td>
             <td>{expense.memo}</td>
             <td>{expense.users?.name}</td>
             <td>
