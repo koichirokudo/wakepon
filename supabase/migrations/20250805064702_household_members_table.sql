@@ -16,6 +16,7 @@ ALTER TABLE household_members
 -- PostgreSQLが無限ループするエラー
 -- Supabase では Create view を使うよりも関数に切り出すほうが多いらしい
 -- TODO: この問題は結構詰まったので、テストコードでRLSのチェックのコードを作成する
+-- https://supabase.com/docs/guides/local-development/testing/overview?utm_source=chatgpt.com
 CREATE OR REPLACE FUNCTION user_in_household(hid uuid)
 RETURNS boolean
 LANGUAGE sql
