@@ -13,6 +13,7 @@ import VerifyOtp from './pages/VerifyOtp.tsx'
 import { AuthProvider } from './contexts/AuthContext.tsx'
 import Layout from './Layout.tsx'
 import ProtectedRoute from './components/ProtectedRoute.tsx'
+import Rlstest from './pages/Rlstest.tsx'
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
@@ -49,6 +50,11 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
             <Route path='/expenses' element={
               <ProtectedRoute>
                 <Expenses />
+              </ProtectedRoute>
+            } />
+            <Route path='/rlstest' element={
+              <ProtectedRoute>
+                <Rlstest />
               </ProtectedRoute>
             } />
           </Route>

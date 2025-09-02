@@ -32,6 +32,9 @@ function App() {
         <li>
           <a href="/profile">プロフィール</a>
         </li>
+        <li>
+          <a href="/rlstest">RLSポリシーテスト</a>
+        </li>
       </ul>
 
       {/* ログイン時のみ表示したい */}

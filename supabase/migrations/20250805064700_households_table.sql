@@ -7,6 +7,7 @@ CREATE TABLE households(
 
 ALTER TABLE households ENABLE ROW LEVEL SECURITY;
 
+-- INSERT: 
 CREATE POLICY "Users can insert household" ON households
     FOR INSERT WITH CHECK (auth.uid() IS NOT NULL);
 
