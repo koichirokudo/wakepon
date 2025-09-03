@@ -1,0 +1,8 @@
+.main {
+  transition: margin-left 0.3s ease;
+  padding: 20px;
+}
+
+.main.shift {
+  margin-left: 250px;
+}
