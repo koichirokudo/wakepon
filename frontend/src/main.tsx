@@ -2,7 +2,6 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
-import App from './App.tsx'
 import './index.css'
 import Categories from './pages/Categories.tsx'
 import Expenses from './pages/Expenses.tsx'
@@ -25,13 +24,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
           <Route path='/verify-otp' element={<VerifyOtp />} />
 
           {/* ログイン必須ページは ProtectedRoute で守る */}
-          <Route element={<Layout>
-          </Layout>}>
-            <Route path='/' element={
-              <ProtectedRoute>
-                <App />
-              </ProtectedRoute>
-            } />
+          <Route element={<Layout></Layout>}>
             <Route path='/categories' element={
               <ProtectedRoute>
                 <Categories />
@@ -47,7 +40,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
                 <Profile />
               </ProtectedRoute>
             } />
-            <Route path='/expenses' element={
+            <Route path='/' element={
               <ProtectedRoute>
                 <Expenses />
               </ProtectedRoute>

@@ -21,7 +21,7 @@ function App() {
           <a href="/signin">ログイン</a>
         </li>
         <li>
-          <a href="/expenses">支出一覧</a>
+          <a href="/">支出一覧</a>
         </li>
         <li>
           <a href="/categories">カテゴリ一覧</a>
