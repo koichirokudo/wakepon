@@ -4,7 +4,6 @@
 html {
   /* 1rem = 16px をベースにして、画面サイズに応じて調整 */
   font-size: clamp(14px, 2.5vw, 16px);
-  font-family: 'M PLUS 1';
 }
 
 html,
@@ -48,7 +47,7 @@ body,
 .opon6 {
   position: absolute;
   bottom: clamp(10px, 3vw, 20px);
-  left: clamp(5px, 2vw, 10px);
+  left: clamp(5px, 2vw, 5px);
   width: clamp(60px, 15vw, 100px);
   height: clamp(60px, 15vw, 100px);
   object-fit: contain;
