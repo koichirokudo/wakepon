@@ -1,17 +1,15 @@
 // src/pages/VerifyOtp.tsx
-import { useLocation, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabaseClient';
 import { useSearchParams } from 'react-router-dom';
-import type { VerifyOtpInput } from '../types';
 import Card from '../components/ui/Card';
 import { CardBody, CardFooter, CardHeader } from '../components/ui/Card';
-import { useForm } from 'react-hook-form';
 import Button from '../components/ui/Button';
 import opon from '../assets/opon3.png';
-import Input from '../components/ui/Input';
-import { validationRules } from '../utils/validation';
+import { OTPInput } from '../components/ui/OtpInput';
 
+// メインのVerifyOtpコンポーネント
 export default function VerifyOtp() {
   const location = useLocation();
   const email = location.state?.email || '';
@@ -20,23 +18,22 @@ export default function VerifyOtp() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [searchParams] = useSearchParams();
   const inviteCode = searchParams.get('invite_code');
-  const { register, handleSubmit, formState: { errors } } = useForm<VerifyOtpInput>({
-    defaultValues: { token: "" }
-  });
 
-  const handleVerifyOtp = async (data: VerifyOtpInput) => {
+  const handleOtpComplete = async (otp: string) => {
+    if (otp.length !== 6) return;
+
     setIsLoading(true);
     setMessage('');
 
     try {
       const { data: authData, error: authError } = await supabase.auth.verifyOtp({
         email: email,
-        token: data.token,
+        token: otp,
         type: 'email',
       });
 
       if (authError) {
-        setMessage(`ログインに失敗ました ${authError.message}`);
+        setMessage(`認証に失敗しました: ${authError.message}`);
         return;
       }
 
@@ -50,20 +47,16 @@ export default function VerifyOtp() {
       const isNewUser = !existingUser;
 
       if (isNewUser && authData?.user) {
-        // 新規ユーザー処理
         if (inviteCode) {
-          // RPC を使用して招待コードを処理
-          // 招待コードがある場合は、招待コードを使用してグループに参加
           const { error } = await supabase.rpc('use_invite_code', {
             p_user_id: authData.user.id,
             p_invite_code: inviteCode,
           });
           if (error) {
-            setMessage(`ユーザー登録処理に失敗しました ${error.message}`);
+            setMessage(`ユーザー登録処理に失敗しました: ${error.message}`);
             return;
           }
         } else {
-          // 招待コードがない場合は新しいグループを作成
           const { data, error } = await supabase.functions.invoke('create-group', {
             body: JSON.stringify({ userId: authData.user.id }),
           });
@@ -85,31 +78,78 @@ export default function VerifyOtp() {
     } finally {
       setIsLoading(false);
     }
-  }
+  };
+
+  const handleResendCode = async () => {
+    if (!email) return;
+
+    setIsLoading(true);
+    setMessage('');
+
+    try {
+      const { error } = await supabase.auth.signInWithOtp({
+        email: email,
+      });
+
+      if (error) {
+        setMessage(`認証コードの再送信に失敗しました: ${error.message}`);
+      } else {
+        setMessage('認証コードを再送信しました。');
+      }
+    } catch (error) {
+      setMessage('エラーが発生しました。');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <div className="verify-otp">
       <Card>
         <CardHeader>認証コード入力</CardHeader>
         <CardBody>
-          <form onSubmit={handleSubmit(handleVerifyOtp)}>
-            <Input
-              label="認証コード"
-              error={errors.token?.message}
-              {...register("token", validationRules.token)}
+          <div className="otp-content">
+            <p className="otp-description">
+              {email} に送信された<br />
+              6桁の認証コードを入力してください
+            </p>
+
+            <OTPInput
+              length={6}
+              onComplete={handleOtpComplete}
+              disabled={isLoading}
             />
-            {message && <p>{message}</p>}
-            <Button size="bg" type="submit">
-              {isLoading ? "認証中" : "認証する"}
-            </Button>
-          </form>
+
+            {message && (
+              <div className={`message ${message.includes('失敗') || message.includes('エラー') ? 'error' : 'success'}`}>
+                {message}
+              </div>
+            )}
+
+            {isLoading && (
+              <div className="loading">
+                <div className="spinner" />
+                認証中...
+              </div>
+            )}
+          </div>
         </CardBody>
         <CardFooter>
-          <img src={opon} className="opon3" />
-          <p style={{ color: 'black', marginTop: '5px', fontWeight: 'bold', fontSize: '10px' }}>認証メールを送信しました</p>
-          <p style={{ color: 'black', marginTop: '5px', fontWeight: 'bold', fontSize: '10px' }}>メール内の認証コードを入力してください</p>
+          <img src={opon} className="opon3" alt="キャラクター" />
+
+          <div className="resend-section">
+            <p className="resend-text">認証コードが届かない場合</p>
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={handleResendCode}
+              disabled={isLoading}
+            >
+              認証コードを再送信
+            </Button>
+          </div>
         </CardFooter>
       </Card>
-    </div >
+    </div>
   );
 }

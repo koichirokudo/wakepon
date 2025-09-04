@@ -78,7 +78,7 @@ body,
 
 .opon3 {
   position: absolute;
-  bottom: clamp(10px, 3vw, 15px);
+  bottom: clamp(10px, 3vw, 10px);
   left: clamp(5px, 2vw, 25px);
   width: clamp(60px, 13vw, 80px);
   height: clamp(60px, 13vw, 80px);

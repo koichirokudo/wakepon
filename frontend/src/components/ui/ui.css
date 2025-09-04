@@ -249,6 +249,175 @@
   text-align: center;
 }
 
+/* === OTP INPUT STYLES === */
+
+.otp-content {
+  text-align: center;
+}
+
+.otp-description {
+  margin-bottom: 20px;
+  color: #666;
+  font-size: clamp(0.9rem, 2.5vw, 1rem);
+  line-height: 1.5;
+}
+
+/* OTP入力コンテナ */
+.otp-input-container {
+  display: flex;
+  gap: clamp(8px, 2vw, 12px);
+  justify-content: center;
+  margin: 20px 0;
+}
+
+/* 各OTP入力欄 */
+.otp-input {
+  width: clamp(40px, 10vw, 50px);
+  height: clamp(40px, 10vw, 50px);
+  text-align: center;
+  font-size: clamp(1.2rem, 4vw, 1.5rem);
+  font-weight: bold;
+  border: 2px solid #d1d5db;
+  border-radius: 8px;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  background-color: white;
+  color: #111827;
+}
+
+/* 入力値がある場合 */
+.otp-input.filled {
+  border-color: #F76E6E;
+  box-shadow: 0 0 0 1px #F76E6E;
+}
+
+/* フォーカス時 */
+.otp-input:focus {
+  border-color: #F76E6E !important;
+  box-shadow: 0 0 0 2px rgba(247, 110, 110, 0.2) !important;
+}
+
+/* 無効化時 */
+.otp-input.disabled {
+  background-color: #f9fafb;
+  color: #9ca3af;
+  cursor: not-allowed;
+}
+
+/* メッセージ表示 */
+.message {
+  padding: 12px;
+  margin-top: 16px;
+  border-radius: 6px;
+  font-size: clamp(0.85rem, 2vw, 0.9rem);
+  border: 1px solid;
+}
+
+.message.success {
+  background-color: #ecfdf5;
+  color: #059669;
+  border-color: #bbf7d0;
+}
+
+.message.error {
+  background-color: #fee2e2;
+  color: #dc2626;
+  border-color: #fecaca;
+}
+
+/* ローディング表示 */
+.loading {
+  margin-top: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: #F76E6E;
+  font-size: clamp(0.9rem, 2.5vw, 1rem);
+}
+
+/* スピナー */
+.spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid #f3f4f6;
+  border-top: 2px solid #F76E6E;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* 再送信セクション */
+.resend-section {
+  text-align: center;
+  margin-top: 16px;
+}
+
+.resend-text {
+  color: #666;
+  margin-bottom: 12px;
+  font-size: clamp(0.8rem, 2vw, 0.9rem);
+}
+
+/* === メディアクエリ対応 === */
+
+/* スマートフォン (480px以下) */
+@media (max-width: 480px) {
+  .otp-input-container {
+    gap: 6px;
+  }
+
+  .otp-input {
+    width: 35px;
+    height: 35px;
+    font-size: 1.1rem;
+  }
+}
+
+/* タブレット (481px - 768px) */
+@media (min-width: 481px) and (max-width: 768px) {
+  .otp-input {
+    width: 45px;
+    height: 45px;
+    font-size: 1.3rem;
+  }
+}
+
+/* 横向きモバイル対応 */
+@media (max-height: 600px) and (orientation: landscape) {
+  .otp-input {
+    width: 35px;
+    height: 35px;
+    font-size: 1.1rem;
+  }
+
+  .otp-description {
+    margin-bottom: 15px;
+    font-size: 0.9rem;
+  }
+}
+
+/* アクセシビリティ対応 */
+@media (prefers-reduced-motion: reduce) {
+  .otp-input {
+    transition: none;
+  }
+
+  .spinner {
+    animation: none;
+  }
+}
+
+
 /* === メディアクエリによる詳細調整 === */
 
 /* スマートフォン (480px以下) */
