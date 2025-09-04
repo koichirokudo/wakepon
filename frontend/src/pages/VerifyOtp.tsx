@@ -3,25 +3,35 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import { supabase } from '../lib/supabaseClient';
 import { useSearchParams } from 'react-router-dom';
+import type { VerifyOtpInput } from '../types';
+import Card from '../components/ui/Card';
+import { CardBody, CardFooter, CardHeader } from '../components/ui/Card';
+import { useForm } from 'react-hook-form';
+import Button from '../components/ui/Button';
+import opon from '../assets/opon3.png';
+import Input from '../components/ui/Input';
+import { validationRules } from '../utils/validation';
 
 export default function VerifyOtp() {
   const location = useLocation();
   const email = location.state?.email || '';
   const navigate = useNavigate();
-  const [otp, setOtp] = useState<string>('');
   const [message, setMessage] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [searchParams] = useSearchParams();
   const inviteCode = searchParams.get('invite_code');
+  const { register, handleSubmit, formState: { errors } } = useForm<VerifyOtpInput>({
+    defaultValues: { token: "" }
+  });
 
-  const handleVerifyOtp = async () => {
+  const handleVerifyOtp = async (data: VerifyOtpInput) => {
     setIsLoading(true);
     setMessage('');
 
     try {
       const { data: authData, error: authError } = await supabase.auth.verifyOtp({
         email: email,
-        token: otp,
+        token: data.token,
         type: 'email',
       });
 
@@ -78,24 +88,28 @@ export default function VerifyOtp() {
   }
 
   return (
-    <div>
-      <h1>認証コードの入力</h1>
-      <form onSubmit={(e) => e.preventDefault()}>
-        <input
-          type="text"
-          placeholder="認証コードを入力してください"
-          value={otp}
-          onChange={(e) => setOtp(e.target.value)}
-          required
-        /><br />
-        <input
-          type="button"
-          value="ログインする"
-          onClick={handleVerifyOtp}
-        /><br />
-        {isLoading && <p>認証中..</p>}
-        {message && <p>{message}</p>}
-      </form>
-    </div>
+    <div className="verify-otp">
+      <Card>
+        <CardHeader>認証コード入力</CardHeader>
+        <CardBody>
+          <form onSubmit={handleSubmit(handleVerifyOtp)}>
+            <Input
+              label="認証コード"
+              error={errors.token?.message}
+              {...register("token", validationRules.token)}
+            />
+            {message && <p>{message}</p>}
+            <Button size="bg" type="submit">
+              {isLoading ? "認証中" : "認証する"}
+            </Button>
+          </form>
+        </CardBody>
+        <CardFooter>
+          <img src={opon} className="opon3" />
+          <p style={{ color: 'black', marginTop: '5px', fontWeight: 'bold', fontSize: '10px' }}>認証メールを送信しました</p>
+          <p style={{ color: 'black', marginTop: '5px', fontWeight: 'bold', fontSize: '10px' }}>メール内の認証コードを入力してください</p>
+        </CardFooter>
+      </Card>
+    </div >
   );
 }

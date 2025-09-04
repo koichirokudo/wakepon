@@ -55,6 +55,38 @@ body,
   z-index: 1;
 }
 
+/* === 認証コード入力画面 レスポンシブ対応 === */
+.verify-otp {
+  background-image: url("./assets/bg01.png");
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: 45% 55%;
+  background-attachment: fixed;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: #f9f9f9;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.verify-otp form {
+  text-align: center;
+  width: 100%;
+}
+
+.opon3 {
+  position: absolute;
+  bottom: clamp(10px, 3vw, 15px);
+  left: clamp(5px, 2vw, 25px);
+  width: clamp(60px, 13vw, 80px);
+  height: clamp(60px, 13vw, 80px);
+  object-fit: contain;
+  z-index: 1;
+}
+
 /* === ユーザー招待画面のレスポンシブ対応 === */
 .user-invite {
   background-image: url("./assets/bg01.png");
@@ -175,7 +207,17 @@ header {
     margin-left: 280px;
   }
 
+  .opon3 {
+    width: 80px;
+    height: 80px;
+  }
+
   .opon4 {
+    width: 80px;
+    height: 80px;
+  }
+
+  .opon6 {
     width: 80px;
     height: 80px;
   }
@@ -207,7 +249,19 @@ header {
     /* ヘッダー分の余白 */
   }
 
+  .opon3 {
+    bottom: 5px;
+    width: 50px;
+    height: 50px;
+  }
+
   .opon4 {
+    bottom: 5px;
+    width: 50px;
+    height: 50px;
+  }
+
+  .opon6 {
     bottom: 5px;
     width: 50px;
     height: 50px;
@@ -252,7 +306,9 @@ header {
     min-height: auto;
   }
 
+  .opon3,
   .opon4,
+  .opon6,
   .heart {
     display: none;
   }

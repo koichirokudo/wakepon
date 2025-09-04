@@ -67,6 +67,10 @@ export type SigninInput = {
   email: string;
 }
 
+export type VerifyOtpInput = {
+  token: string;
+}
+
 export type ApiResponse<T> = {
   success: boolean;
   data?: T;

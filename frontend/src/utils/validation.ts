@@ -63,8 +63,25 @@ export const validationRules = {
   
   memo: {
     maxLength: {
-      value: 100,
-      message: "メモは100文字以内で入力してください"
+      value: 10,
+      message: "メモは10文字以内で入力してください"
+    }
+  },
+
+  token: {
+    maxLength: {
+      value: 6,
+      message: "認証コードは6桁の数値を入力してください"
+    },
+    validate: (value: string) => {
+      const num = parseFloat(value);
+      if (isNaN(num)) {
+        return "有効な数値を入力してください";
+      }
+      if (num % 1 !== 0) {
+        return "整数を入力してください";
+      }
+      return true;
     }
   }
 };
