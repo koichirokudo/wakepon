@@ -5,7 +5,6 @@ import Header from "./components/Header";
 import Footer from "./components/Footer";
 import Drawer from "./components/ui/Drawer";
 import { useAuth } from "./contexts/AuthContext";
-import '@fontsource-variable/m-plus-1';
 
 export default function Layout() {
   const { user } = useAuth();

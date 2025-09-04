@@ -13,9 +13,14 @@ import { AuthProvider } from './contexts/AuthContext.tsx'
 import Layout from './Layout.tsx'
 import ProtectedRoute from './components/ProtectedRoute.tsx'
 import Rlstest from './pages/Rlstest.tsx';
+
 import "@fontsource/m-plus-1";
+import "@fontsource/m-plus-1/400.css"; // 通常
+import "@fontsource/m-plus-1/700.css"; // 太字
+
 import 'normalize.css';
 import './reset.css';
+
 import './index.css';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
