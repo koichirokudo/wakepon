@@ -12,7 +12,11 @@ import VerifyOtp from './pages/VerifyOtp.tsx'
 import { AuthProvider } from './contexts/AuthContext.tsx'
 import Layout from './Layout.tsx'
 import ProtectedRoute from './components/ProtectedRoute.tsx'
-import Rlstest from './pages/Rlstest.tsx'
+import Rlstest from './pages/Rlstest.tsx';
+import "@fontsource/m-plus-1";
+import 'normalize.css';
+import './reset.css';
+import './index.css';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>

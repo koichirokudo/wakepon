@@ -11,12 +11,12 @@ export default function Header() {
   }
 
   return (
-    <header style={{ background: "#eee", padding: "1rem" }}>
+    <header>
       {user?.id ? (
-        <>
+        <p>
           ヘッダー：
           ログイン中 {user?.name}
-        </>
+        </p>
       ) : (
         <nav>
           <Link to="/signin">ログイン</Link>

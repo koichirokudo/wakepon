@@ -59,7 +59,7 @@ export type HouseholdCategoryInsert = {
   category_id: string;
 };
 
-export type Invite = {
+export type InviteInput = {
   email: string;
 };
 

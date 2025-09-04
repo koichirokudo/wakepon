@@ -16,8 +16,8 @@ export default function Drawer({ isOpen, setIsOpen }: { isOpen: boolean, setIsOp
     { label: "カテゴリ一覧", to: "/categories", icon: CategoriesIcon },
     { label: "ユーザー招待", to: "/invite", icon: UserInviteIcon },
     { label: "プロフィール", to: "/profile", icon: ProfileIcon },
-    { label: "プライバシーポリシー", to: "/", icon: PrivacyPolicyIcon },
-    { label: "ログアウト", to: "/", icon: LogoutIcon },
+    // { label: "プライバシーポリシー", to: "/", icon: PrivacyPolicyIcon },
+    // { label: "ログアウト", to: "/", icon: LogoutIcon },
   ];
 
   return (

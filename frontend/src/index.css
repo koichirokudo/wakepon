@@ -1,8 +1,75 @@
 .main {
+  font-family: 'M PLUS 1', sans-serif;
   transition: margin-left 0.3s ease;
-  padding: 20px;
 }
 
 .main.shift {
-  margin-left: 250px;
+  margin-left: 220px;
+}
+
+.user-invite {
+  background-image: url("./assets/bg01.png");
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: #f9f9f9;
+}
+
+.user-invite form {
+  text-align: center;
+}
+
+.opon4 {
+  position: absolute;
+  bottom: 20px;
+  left: 10px;
+  width: 100px;
+  height: 100px;
+  object-fit: contain
+}
+
+/* ふわふわアニメーション */
+@keyframes float {
+  0% {
+    transform: rotate(-20deg) translateY(0);
+  }
+
+  50% {
+    transform: rotate(-25deg) translateY(-10px);
+  }
+
+  100% {
+    transform: rotate(-20deg) translateY(0);
+  }
+}
+
+.heart {
+  position: absolute;
+  bottom: 85px;
+  left: 15px;
+  height: 20px;
+  width: 20px;
+  object-fit: contain;
+  transform: rotate(-20deg);
+  animation: float 3s ease-in-out infinite;
+}
+
+/* Header */
+header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  color: white;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
 }

@@ -3,11 +3,21 @@ import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabaseClient';
 import { useAuth } from '../contexts/AuthContext';
 import { nanoid } from 'nanoid';
-import type { Invite } from '../types';
+import type { InviteInput } from '../types';
+import Card from '../components/ui/Card';
+import { CardHeader, CardBody, CardFooter } from '../components/ui/Card';
+import '../index.css';
+import { useForm } from 'react-hook-form';
+import Input from '../components/ui/Input';
+import Button from '../components/ui/Button';
+import opon from '../assets/opon4.png';
+import heart from '../assets/heart.png';
 
 export default function Invite() {
   const { user, member } = useAuth();
-  const [invite, setInvite] = useState<Invite>({ email: '' });
+  const { register, handleSubmit, formState: { errors } } = useForm<InviteInput>({
+    defaultValues: { email: "" }
+  });
   const [message, setMessage] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const appOrigin = import.meta.env.VITE_APP_ORIGIN || 'http://localhost:5173';
@@ -30,14 +40,14 @@ export default function Invite() {
     return nanoid(12);
   }
 
-  const handleInvite = async () => {
+  const onInvite = async (data: InviteInput) => {
     setIsLoading(true);
     setMessage('');
 
     // 招待コードの生成と保存
     const code = generateInviteCode();
     await supabase.from('invite_codes').insert({
-      email: invite.email,
+      email: data.email,
       household_id: member?.household_id,
       code: code,
       expires_at: new Date(Date.now() + 1000 * 60 * 60 * 24), // 24時間後に期限切れ
@@ -46,9 +56,9 @@ export default function Invite() {
     try {
       // 招待メールの送信
       // ローカル環境でのテスト http://localhost:5173/signin?invite_code={code}
-      const { data, error } = await supabase.functions.invoke('send-invite', {
+      const { data: inviteData, error: inviteError } = await supabase.functions.invoke('send-invite', {
         body: JSON.stringify({
-          to: invite.email,
+          to: data.email,
           subject: `【わけわけ】${user?.name}さんがあなたを招待しました`,
           html: `<p>こんにちは！共有家計簿アプリのわけわけです。</p>
           <p>あなたを${user?.name}さんがグループに招待しています。以下のリンクから参加してください。</p>
@@ -56,9 +66,9 @@ export default function Invite() {
         }),
       });
 
-      if (error) {
-        setMessage(error.message);
-      } else if (data) {
+      if (inviteError) {
+        setMessage(inviteError.message);
+      } else if (inviteData) {
         setMessage('招待メールを送信しました');
       }
     } catch (error) {
@@ -70,14 +80,31 @@ export default function Invite() {
   };
 
   return (
-    <div>
-      <h1>ユーザー招待</h1>
-      <form onSubmit={(e) => e.preventDefault()}>
-        <input type="email" placeholder="招待するメールアドレス" value={invite.email} onChange={(e) => setInvite({ ...invite, email: e.target.value })} required />
-        <input type="button" value="招待する" onClick={handleInvite} />
-        {isLoading && <p>招待中...</p>}
-        {message && <p>{message}</p>}
-      </form>
+    <div className="user-invite">
+      <Card>
+        <CardHeader>ユーザー招待</CardHeader>
+        <CardBody>
+          <form onSubmit={handleSubmit(onInvite)}>
+            <Input
+              label="メールアドレス:"
+              error={errors.email?.message}
+              {...register("email", {
+                required: "メールアドレスを入力してください"
+              })}
+            />
+            {/* TODO: このあたりは通知toastに移行させる */}
+            {isLoading && <p>招待中...</p>}
+            {message && <p>{message}</p>}
+            <Button size="bg" type="submit">招待する</Button>
+          </form>
+        </CardBody>
+        <CardFooter>
+          <img src={heart} className="heart" />
+          <img src={opon} className="opon4" />
+          <p style={{ color: 'black', marginTop: '5px', fontWeight: 'bold', fontSize: '10px' }}>クリックすると招待メールが送信されます。</p>
+          <p style={{ color: 'black', marginTop: '5px', fontWeight: 'bold', fontSize: '10px' }}>招待できない場合</p>
+        </CardFooter>
+      </Card>
     </div>
   );
 }
