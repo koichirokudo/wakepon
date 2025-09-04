@@ -1,26 +1,35 @@
+/* === RESPONSIVE UI.CSS === */
+
+/* === Base Styles === */
+html {
+  /* 1rem = 16px をベースにして、画面サイズに応じて調整 */
+  font-size: clamp(14px, 2.5vw, 16px);
+}
+
 /* === label === */
 .label-base {
   color: #666565;
   display: block;
   text-align: left;
-  margin-bottom: 10px;
+  margin-bottom: clamp(8px, 2vw, 10px);
+  font-size: clamp(0.9rem, 2.5vw, 1rem);
 }
 
 /* === input === */
 .input-base {
-  padding: 0.375rem;
+  padding: clamp(0.25rem, 2vw, 0.375rem);
   border-radius: 4px;
-  border-width: 0.5px;
   border: 1px solid #ccc;
-  height: 40px;
+  height: clamp(35px, 8vw, 40px);
   width: 100%;
   box-sizing: border-box;
   margin-bottom: 1rem;
+  font-size: clamp(0.9rem, 2.5vw, 1rem);
 }
 
 .input-error {
   color: red;
-  font-size: 0.875rem;
+  font-size: clamp(0.75rem, 2vw, 0.875rem);
   margin-top: 4px;
 }
 
@@ -28,14 +37,15 @@
 .button-base {
   cursor: pointer;
   transition: background-color 0.2s, box-shadow 0.2s;
+  font-size: clamp(0.9rem, 2.5vw, 1rem);
+  border: none;
+  border-radius: 0.375rem;
 }
 
 /* variant */
 .button-primary {
   background-color: #F76E6E;
   color: #FFFF;
-  border: none;
-  border-radius: 0.375rem;
 }
 
 .button-primary:hover {
@@ -50,8 +60,6 @@
 .button-secondary {
   background-color: #e5e7eb;
   color: #111827;
-  border: none;
-  border-radius: 0.375rem;
 }
 
 .button-secondary:hover {
@@ -66,8 +74,6 @@
 .button-danger {
   background-color: #dc2626;
   color: white;
-  border: none;
-  border-radius: 0.375rem;
 }
 
 .button-danger:hover {
@@ -81,35 +87,36 @@
 
 /* size */
 .button-sm {
-  padding: 0.375rem 0.75rem;
-  font-size: 0.875rem;
+  padding: clamp(0.25rem, 2vw, 0.375rem) clamp(0.5rem, 3vw, 0.75rem);
+  font-size: clamp(0.8rem, 2vw, 0.875rem);
 }
 
 .button-md {
-  padding: 0.5rem 1rem;
-  font-size: 1rem;
+  padding: clamp(0.375rem, 2.5vw, 0.5rem) clamp(0.75rem, 4vw, 1rem);
+  font-size: clamp(0.9rem, 2.5vw, 1rem);
 }
 
 .button-lg {
-  padding: 0.75rem 1.5rem;
-  font-size: 1.125rem;
+  padding: clamp(0.5rem, 3vw, 0.75rem) clamp(1rem, 5vw, 1.5rem);
+  font-size: clamp(1rem, 3vw, 1.125rem);
 }
 
 .button-bg {
-  padding: 0.65rem 4.3rem;
-  font-size: 1.225rem;
+  padding: clamp(0.5rem, 3vw, 0.65rem) clamp(2rem, 8vw, 4.3rem);
+  font-size: clamp(1rem, 3.5vw, 1.225rem);
 }
-
 
 /* === Select === */
 .select-base {
-  padding: 0.5rem 1rem;
+  padding: clamp(0.375rem, 2vw, 0.5rem) clamp(0.75rem, 3vw, 1rem);
   border: 1px solid #d1d5db;
   border-radius: 0.375rem;
-  font-size: 1rem;
+  font-size: clamp(0.9rem, 2.5vw, 1rem);
+  width: 100%;
+  box-sizing: border-box;
 }
 
-.select:focus {
+.select-base:focus {
   outline: none;
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.5);
 }
@@ -119,53 +126,55 @@
 /* ハンバーガーボタン */
 .hamburger {
   position: fixed;
-  top: 0px;
-  left: 0px;
-  font-size: 24px;
+  top: clamp(5px, 2vw, 10px);
+  left: clamp(5px, 2vw, 10px);
+  font-size: clamp(20px, 5vw, 24px);
   cursor: pointer;
   border: none;
   background: none;
-  padding: 10px;
+  padding: clamp(8px, 2vw, 10px);
   z-index: 1001;
 }
 
 /* サイドメニュー 上部 */
 .drawer-top {
-  padding: 0.5rem;
-  font-size: 1rem;
+  padding: clamp(0.25rem, 2vw, 0.5rem);
+  font-size: clamp(0.9rem, 3vw, 1rem);
   font-weight: bold;
   border-bottom: 1px solid #555;
   background: #787878;
 }
 
-/* サイドメニュー */
+/* サイドメニュー - レスポンシブ対応 */
 .drawer {
   position: fixed;
   top: 0;
-  left: -220px;
-  width: 220px;
+  left: clamp(-250px, -60vw, -220px);
+  width: clamp(200px, 60vw, 220px);
   height: 100%;
   background: #FFF;
   color: white;
   transition: left 0.3s ease;
   z-index: 1000;
+  overflow-y: auto;
 }
 
 /* リスト */
 .drawer ul {
   list-style: none;
-  padding: 5px 10px 0px 10px;
+  padding: clamp(5px, 2vw, 10px);
   margin: 0;
   font-weight: bold;
 }
 
 .drawer li {
-  margin: 15px 0;
+  margin: clamp(10px, 3vw, 15px) 0;
 }
 
 .drawer a {
   color: black;
   text-decoration: none;
+  font-size: clamp(0.9rem, 2.5vw, 1rem);
 }
 
 /* メニューを画面に出す */
@@ -196,48 +205,119 @@
 .menu-link {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: clamp(8px, 2vw, 10px);
   color: white;
   text-decoration: none;
 }
 
 .menu-icon {
-  width: 24px;
-  height: 24px;
+  width: clamp(20px, 5vw, 24px);
+  height: clamp(20px, 5vw, 24px);
 }
 
 /* === Card === */
 .card {
-  position: absolute;
-  top: 35%;
+  position: fixed;
+  top: 30%;
   left: 50%;
   transform: translate(-50%, -50%);
+  width: min(90vw, 400px);
+  min-height: fit-content;
+  max-height: 90vh;
+  overflow-y: auto;
   background-color: white;
   border-radius: 12px;
   box-shadow: 3px 8px 7px 2px rgba(0, 0, 0, 0.1);
-  padding: 20px;
-  max-width: 400px;
+  padding: clamp(15px, 5vw, 20px);
   transition: transform 0.2s;
-  width: 100%;
-  margin: 0 auto;
-  width: min(90%, 400px);
-  height: 25%;
+  z-index: 1000;
 }
 
 .card-header {
-  font-size: 1.8rem;
+  font-size: clamp(1.4rem, 5vw, 1.8rem);
   font-weight: bold;
-  margin-bottom: 1.4rem;
+  margin-bottom: clamp(1rem, 3vw, 1.4rem);
+  text-align: left;
 }
 
 .card-body {
-  font-size: 1rem;
+  font-size: clamp(0.9rem, 2.5vw, 1rem);
   color: #333;
+  line-height: 1.5;
 }
 
 .card-footer {
-  margin-top: 12px;
-  font-size: 0.9rem;
+  margin-top: clamp(8px, 3vw, 12px);
+  font-size: clamp(0.8rem, 2vw, 0.9rem);
   color: #666;
   text-align: center;
+}
+
+/* === メディアクエリによる詳細調整 === */
+
+/* スマートフォン (480px以下) */
+@media (max-width: 480px) {
+  .card {
+    width: 95vw;
+    padding: 15px;
+    border-radius: 8px;
+  }
+
+  .button-bg {
+    padding: 0.6rem 1.5rem;
+    width: 100%;
+    font-size: 1rem;
+  }
+
+  .drawer {
+    width: 80vw;
+    left: -80vw;
+  }
+
+  .input-base {
+    height: 45px;
+  }
+}
+
+/* タブレット (481px - 768px) */
+@media (min-width: 481px) and (max-width: 768px) {
+  .card {
+    width: min(80vw, 400px);
+  }
+
+  .drawer {
+    width: 280px;
+    left: -280px;
+  }
+}
+
+/* デスクトップ (769px以上) */
+@media (min-width: 769px) {
+  .card {
+    width: min(400px, 90vw);
+  }
+}
+
+/* 横向きモバイル対応 */
+@media (max-height: 600px) and (orientation: landscape) {
+  .card {
+    max-height: 95vh;
+    padding: 10px 15px;
+  }
+
+  .card-header {
+    font-size: 1.4rem;
+    margin-bottom: 0.8rem;
+  }
+}
+
+/* アクセシビリティ: 大きなフォントサイズを希望するユーザーへの対応 */
+@media (prefers-reduced-motion: reduce) {
+
+  .card,
+  .button-base,
+  .drawer,
+  .overlay {
+    transition: none;
+  }
 }

@@ -12,6 +12,7 @@ import Input from '../components/ui/Input';
 import Button from '../components/ui/Button';
 import opon from '../assets/opon4.png';
 import heart from '../assets/heart.png';
+import { validationRules } from '../utils/validation';
 
 export default function Invite() {
   const { user, member } = useAuth();
@@ -88,14 +89,13 @@ export default function Invite() {
             <Input
               label="メールアドレス:"
               error={errors.email?.message}
-              {...register("email", {
-                required: "メールアドレスを入力してください"
-              })}
+              {...register("email", validationRules.email)}
             />
             {/* TODO: このあたりは通知toastに移行させる */}
-            {isLoading && <p>招待中...</p>}
             {message && <p>{message}</p>}
-            <Button size="bg" type="submit">招待する</Button>
+            <Button size="bg" type="submit">
+              {isLoading ? "招待中..." : "招待する"}
+            </Button>
           </form>
         </CardBody>
         <CardFooter>

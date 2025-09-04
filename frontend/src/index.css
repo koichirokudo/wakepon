@@ -1,46 +1,91 @@
+/* === RESPONSIVE INDEX.CSS === */
+
 .main {
   font-family: 'M PLUS 1', sans-serif;
   transition: margin-left 0.3s ease;
+  font-size: clamp(14px, 2.5vw, 16px);
+  line-height: 1.6;
 }
 
 .main.shift {
-  margin-left: 220px;
+  margin-left: clamp(200px, 60vw, 220px);
 }
 
-.user-invite {
+/* === ログイン画面のレスポンシブ対応 === */
+.signin {
   background-image: url("./assets/bg01.png");
   background-size: cover;
   background-repeat: no-repeat;
-  background-position: center;
+  background-position: 45% 55%;
+  background-attachment: fixed;
   position: relative;
   display: flex;
   justify-content: center;
   align-items: center;
   min-height: 100vh;
   background-color: #f9f9f9;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.signin form {
+  text-align: center;
+  width: 100%;
+}
+
+.opon6 {
+  position: absolute;
+  bottom: clamp(10px, 3vw, 20px);
+  left: clamp(5px, 2vw, 10px);
+  width: clamp(60px, 15vw, 100px);
+  height: clamp(60px, 15vw, 100px);
+  object-fit: contain;
+  z-index: 1;
+}
+
+/* === ユーザー招待画面のレスポンシブ対応 === */
+.user-invite {
+  background-image: url("./assets/bg01.png");
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: 45% 55%;
+  background-attachment: fixed;
+  /* スクロール時の視覚効果 */
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: #f9f9f9;
+  padding: 20px;
+  /* 画面端への余白 */
+  box-sizing: border-box;
 }
 
 .user-invite form {
   text-align: center;
+  width: 100%;
 }
 
+/* === アニメーションキャラクターのレスポンシブ対応 === */
 .opon4 {
   position: absolute;
-  bottom: 20px;
-  left: 10px;
-  width: 100px;
-  height: 100px;
-  object-fit: contain
+  bottom: clamp(10px, 3vw, 20px);
+  left: clamp(5px, 2vw, 10px);
+  width: clamp(60px, 15vw, 100px);
+  height: clamp(60px, 15vw, 100px);
+  object-fit: contain;
+  z-index: 1;
 }
 
-/* ふわふわアニメーション */
+/* ふわふわアニメーション - レスポンシブ対応 */
 @keyframes float {
   0% {
     transform: rotate(-20deg) translateY(0);
   }
 
   50% {
-    transform: rotate(-25deg) translateY(-10px);
+    transform: rotate(-25deg) translateY(clamp(-8px, -2vw, -10px));
   }
 
   100% {
@@ -50,26 +95,159 @@
 
 .heart {
   position: absolute;
-  bottom: 85px;
-  left: 15px;
-  height: 20px;
-  width: 20px;
+  bottom: clamp(50px, 12vw, 85px);
+  left: clamp(8px, 2.5vw, 15px);
+  height: clamp(15px, 4vw, 20px);
+  width: clamp(15px, 4vw, 20px);
   object-fit: contain;
   transform: rotate(-20deg);
   animation: float 3s ease-in-out infinite;
+  z-index: 1;
 }
 
-/* Header */
+/* === Header のレスポンシブ対応 === */
 header {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
-  height: 50px;
+  height: clamp(45px, 10vw, 50px);
   display: flex;
   align-items: center;
-  padding: 0 20px;
+  padding: 0 clamp(15px, 5vw, 20px);
   color: white;
   background-color: rgba(0, 0, 0, 0.5);
   z-index: 1000;
+  font-size: clamp(0.9rem, 2.5vw, 1rem);
+  box-sizing: border-box;
+}
+
+/* === メディアクエリによる詳細調整 === */
+
+/* スマートフォン (480px以下) */
+@media (max-width: 480px) {
+  .main.shift {
+    margin-left: 80vw;
+    /* ドロワーの幅に合わせる */
+  }
+
+  .user-invite {
+    padding: 10px;
+    background-attachment: scroll;
+    /* モバイルでは固定背景を無効 */
+  }
+
+  .opon4 {
+    bottom: 15px;
+    left: 8px;
+    width: 70px;
+    height: 70px;
+  }
+
+  .heart {
+    bottom: 60px;
+    left: 12px;
+    width: 16px;
+    height: 16px;
+  }
+
+  header {
+    height: 45px;
+    padding: 0 15px;
+  }
+}
+
+/* タブレット (481px - 768px) */
+@media (min-width: 481px) and (max-width: 768px) {
+  .main.shift {
+    margin-left: 280px;
+  }
+
+  .opon4 {
+    width: 80px;
+    height: 80px;
+  }
+
+  .heart {
+    width: 18px;
+    height: 18px;
+  }
+}
+
+/* デスクトップ (769px以上) */
+@media (min-width: 769px) {
+  .main.shift {
+    margin-left: 220px;
+  }
+
+  /* デスクトップでは背景を固定 */
+  .user-invite {
+    background-attachment: fixed;
+  }
+}
+
+/* 横向きモバイル対応 */
+@media (max-height: 600px) and (orientation: landscape) {
+  .user-invite {
+    min-height: 100vh;
+    align-items: flex-start;
+    padding-top: 60px;
+    /* ヘッダー分の余白 */
+  }
+
+  .opon4 {
+    bottom: 5px;
+    width: 50px;
+    height: 50px;
+  }
+
+  .heart {
+    bottom: 35px;
+    width: 14px;
+    height: 14px;
+  }
+
+  header {
+    height: 40px;
+  }
+}
+
+/* 高解像度ディスプレイ対応 */
+@media (-webkit-min-device-pixel-ratio: 2),
+(min-resolution: 192dpi) {
+  .user-invite {
+    background-image: url("./assets/bg01@2x.png");
+    /* 高解像度版があれば */
+  }
+}
+
+
+/* アクセシビリティ: アニメーションを減らしたいユーザーへの対応 */
+@media (prefers-reduced-motion: reduce) {
+  .heart {
+    animation: none;
+  }
+
+  .main {
+    transition: none;
+  }
+}
+
+/* 印刷時の対応 */
+@media print {
+  .user-invite {
+    background: white;
+    min-height: auto;
+  }
+
+  .opon4,
+  .heart {
+    display: none;
+  }
+
+  header {
+    position: static;
+    background: transparent;
+    color: black;
+  }
 }

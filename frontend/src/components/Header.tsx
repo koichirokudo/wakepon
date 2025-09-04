@@ -1,5 +1,6 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
+import Button from "./ui/Button";
 
 export default function Header() {
   const { user, signout } = useAuth();
@@ -12,15 +13,11 @@ export default function Header() {
 
   return (
     <header>
-      {user?.id ? (
-        <p>
-          ヘッダー：
-          ログイン中 {user?.name}
-        </p>
-      ) : (
-        <nav>
-          <Link to="/signin">ログイン</Link>
-        </nav>
+      {user?.id && (
+        <>
+          <p>ヘッダー： ログイン中 {user?.name}</p>
+          <Button onClick={handleSignOut}>ログアウト</Button>
+        </>
       )}
     </header>
   );
