@@ -17,7 +17,6 @@
   height: clamp(35px, 8vw, 40px);
   width: 100%;
   box-sizing: border-box;
-  margin-bottom: 1rem;
   font-size: clamp(0.9rem, 2.5vw, 1rem);
 }
 
@@ -100,6 +99,11 @@
 .button-bg {
   padding: clamp(0.5rem, 3vw, 0.65rem) clamp(2rem, 8vw, 4.3rem);
   font-size: clamp(1rem, 3.5vw, 1.225rem);
+}
+
+/* === Icon Button ===*/
+.icon-button {
+  border: none;
 }
 
 /* === Select === */

@@ -11,6 +11,7 @@ type AuthContextType = {
   isLoading: boolean;
   signin: (email: string) => Promise<AuthOtpResponse>;
   signout: () => Promise<{ error: AuthError | null; }>;
+  setUser: React.Dispatch<React.SetStateAction<User | null>>;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -83,7 +84,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ session, user, member, isLoading, signin, signout }}>
+    <AuthContext.Provider value={{ session, user, member, isLoading, signin, signout, setUser }}>
       {children}
     </AuthContext.Provider>
   );

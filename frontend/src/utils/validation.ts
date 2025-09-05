@@ -83,6 +83,21 @@ export const validationRules = {
       }
       return true;
     }
+  },
+
+  username: {
+    minLength: {
+      value: 1,
+      message: "ユーザー名は1文字以上入力してください"
+    },
+    maxLength: {
+      value: 20,
+      message: "ユーザー名は20文字以内で入力してください"
+    },
+    pattern: {
+      value: /^[a-zA-Z0-9あ-んア-ヶー\s]*$/,
+      message: "ユーザー名に使用できない文字が含まれています"
+    }
   }
 };
 

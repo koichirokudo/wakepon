@@ -67,6 +67,11 @@ export type SigninInput = {
   email: string;
 }
 
+export type ProfileInput = {
+  email: string;
+  name: string;
+}
+
 export type VerifyOtpInput = {
   token: string;
 }
