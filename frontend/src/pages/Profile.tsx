@@ -172,7 +172,7 @@ export default function Profile() {
                     readOnly
                     {...registerName("name")}
                     className="icon-input"
-                    style={{ border: 'none' }}
+                    style={{ border: 'none', fontWeight: 'bold' }}
                   />
                   <IconButton
                     type="button"
@@ -194,6 +194,7 @@ export default function Profile() {
                   autoFocus
                   {...registerName("name", validationRules.username)}
                   className="icon-input"
+                  style={{ fontWeight: 'bold' }}
                 />
                 {isNameSaving ? (
                   <IconButton
@@ -225,7 +226,7 @@ export default function Profile() {
                     readOnly
                     {...registerEmail("email")}
                     className="icon-input"
-                    style={{ border: 'none' }}
+                    style={{ border: 'none', fontWeight: 'bold' }}
                   />
                   <IconButton
                     type="button"
@@ -250,6 +251,7 @@ export default function Profile() {
                     required: false,
                   })}
                   className="icon-input"
+                  style={{ fontWeight: 'bold' }}
                 />
                 {isEmailSaving ? (
                   <IconButton

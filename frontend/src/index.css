@@ -167,10 +167,10 @@ header {
 
 /* === プロフィール画面 === */
 .profile {
-  background-image: url("./assets/bg01.png");
+  background-image: url("./assets/bg02.png");
   background-size: cover;
   background-repeat: no-repeat;
-  background-position: 45% 55%;
+  background-position: 10% 90%;
   background-attachment: fixed;
   position: relative;
   display: flex;
