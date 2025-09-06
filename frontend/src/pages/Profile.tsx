@@ -1,28 +1,58 @@
 // src/pages/Profile.tsx
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { supabase } from '../lib/supabaseClient';
 import { useAuth } from '../contexts/AuthContext';
 import Card, { CardBody, CardFooter, CardHeader } from '../components/ui/Card';
 import Input from '../components/ui/Input';
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import type { ProfileInput } from '../types';
 import { validationRules } from '../utils/validation';
 import IconButton from '../components/ui/IconButton';
 import edit from '../assets/edit.png';
 import cancel from '../assets/cancel.png';
 import save from '../assets/save.png';
+import camera from '../assets/camera.png';
+import defaultAvatar from '../assets/default-avatar.png';
 
 // メッセージの型定義
 type MessageType = 'success' | 'error' | 'info';
+
+type ImageUploadForm = {
+  image: FileList;
+  description?: string;
+};
 
 interface Message {
   type: MessageType;
   content: string;
 }
+
 export default function Profile() {
   const { user, session, setUser } = useAuth();
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+
+  // 画像アップロードフォーム
+  const [uploadedImageUrl, setUploadedImageUrl] = useState<string>(user?.avatar_url || '');
+  const [isUploading, setIsUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const {
+    register: registerImage,
+    handleSubmit: handleSubmitImage,
+    control,
+    reset: resetImage,
+    formState: { errors: imageError }
+  } = useForm<ImageUploadForm>();
+
+  // アイコンボタンからファイル選択を開く
+  const handleAvatarClick = () => {
+    fileInputRef.current?.click();
+  }
+
+  const handleUpload = async (files: FileList) => {
+    // 既存の onUploadImage の処理を呼ぶ
+    await onUploadImage({ image: files });
+  };
 
   // ユーザー名フォーム
   const [isNameEditing, setIsNameEditing] = useState(false);
@@ -98,6 +128,76 @@ export default function Profile() {
     setIsEmailEditing(!isEmailEditing);
   };
 
+  const onUploadImage = async (data: ImageUploadForm) => {
+    if (!data.image || data.image.length === 0) {
+      addMessage('error', '画像を選択してください');
+      return;
+    }
+
+    if (!user) {
+      addMessage('error', 'ログインが必要です');
+      return;
+    }
+
+    setIsLoading(true);
+    clearMessages();
+
+    try {
+      const file = data.image[0];
+
+      // ファイル名を一意にする（ユーザーID + タイムスタンプ + 元のファイル名）
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${user.id}/${Date.now()}.${fileExt}`;
+
+      // Supabase Storageにアップロード
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from('avatars') // バケット名（事前にSupabaseで作成が必要）
+        .upload(fileName, file, {
+          cacheControl: '3600',
+          upsert: false // 同じファイル名の場合は上書きしない
+        });
+
+      if (uploadError) {
+        throw uploadError;
+      }
+
+      // アップロードされた画像のパブリックURLを取得
+      const { data: urlData } = supabase.storage
+        .from('images')
+        .getPublicUrl(uploadData.path);
+
+      setUploadedImageUrl(urlData.publicUrl);
+      addMessage('success', '画像をアップロードしました！');
+
+      // DBに画像情報を保存
+      await saveImageToDatabase(uploadData.path, fileName);
+
+      resetImage(); // フォームをリセット
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  // DBに画像情報を保存
+  const saveImageToDatabase = async (fileName: string, imagePath: string) => {
+    try {
+      const { error } = await supabase
+        .from('users')
+        .update({
+          avatar_name: fileName,
+          avatar_url: imagePath,
+        })
+        .eq('id', user?.id);
+      if (error) {
+        console.error('DB保存エラー:', error);
+      }
+    } catch (error) {
+      console.error('DB保存エラー:', error);
+    }
+  };
+
   const onUpdateName = async (data: ProfileInput) => {
     if (!data.name?.trim() || data.name === user?.name) {
       addMessage('info', 'ユーザー名に変更はありません');
@@ -161,6 +261,35 @@ export default function Profile() {
       <Card>
         <CardHeader>プロフィール</CardHeader>
         <CardBody>
+          {/* プロフィール画像フォーム */}
+          <div className="profile-image">
+            <img src={uploadedImageUrl || defaultAvatar} alt="Avatar" className="avatar" />
+            <IconButton
+              type="button"
+              className='avatar-change-btn'
+              alt="アバター変更"
+              src={camera}
+              onClick={handleAvatarClick}
+            />
+            <Controller
+              name="image"
+              control={control}
+              render={({ field }) => (
+                <input
+                  type="file"
+                  accept="image/*"
+                  style={{ display: 'none' }}
+                  ref={(el) => {
+                    field.ref(el);
+                    fileInputRef.current = el;
+                  }}
+                  onChange={(e) => {
+                    if (e.target.files) handleUpload(e.target.files);
+                  }}
+                />
+              )}
+            />
+          </div>
           {/* ユーザー名フォーム */}
           {!isNameEditing && !isLoading ? (
             // 表示モード

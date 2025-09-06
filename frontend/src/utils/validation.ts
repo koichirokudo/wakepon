@@ -98,6 +98,27 @@ export const validationRules = {
       value: /^[a-zA-Z0-9あ-んア-ヶー\s]*$/,
       message: "ユーザー名に使用できない文字が含まれています"
     }
+  },
+
+  image: {
+    validate: {
+      fileSize: (files: FileList) => {
+        if (files && files[0]) {
+          const file = files[0];
+          const maxSize = 5 * 1024 * 1024;
+          return file.size <= maxSize || 'ファイルサイズは5MB以下にしてください';
+        }
+        return true;
+      },
+      fileType: (files: FileList) => {
+        if (files && files[0]) {
+          const file = files[0];
+          const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+          return allowedTypes.includes(file.type) || 'JPEG、PNG、GIF、WebP形式のみ対応しています';
+        }
+        return true;
+      }
+    }
   }
 };
 

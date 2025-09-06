@@ -199,6 +199,22 @@ header {
   color: #212529;
 }
 
+.profile-image {
+  position: relative;
+  text-align: center;
+}
+
+.avatar-change-btn {
+  position: absolute;
+  top: 75%;
+  left: 55%;
+  border: none;
+  border-radius: 50%;
+  background: #FFF;
+  font-size: clamp(1.2rem, 4vw, 1.5rem);
+  cursor: pointer;
+}
+
 .input-wrapper {
   position: relative;
   width: 100%;

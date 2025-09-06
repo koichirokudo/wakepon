@@ -1,6 +1,8 @@
 CREATE TABLE users (
     id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
     name TEXT NOT NULL,
+    avatar_url TEXT,
+    avatar_filename TEXT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL,
     updated_at TIMESTAMP WITH TIME ZONE NOT NULL
 );
@@ -48,3 +50,9 @@ CREATE TRIGGER set_timestamp
 BEFORE INSERT OR UPDATE ON users
 FOR EACH ROW
 EXECUTE FUNCTION update_timestamp();
+
+-- supabase storage 自分のファイルだけアップロード・取得可能
+CREATE POLICY "Users can manage their own avatar"
+ON storage.objects
+FOR ALL
+USING (auth.uid() = owner);
