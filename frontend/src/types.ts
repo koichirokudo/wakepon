@@ -1,7 +1,7 @@
 export type User = {
   id: string;
   name: string;
-  avatar_name: string | null;
+  avatar_filename: string | null;
   avatar_url: string | null;
   created_at: Date;
   updated_at: Date;

@@ -186,7 +186,7 @@ export default function Profile() {
       const { error } = await supabase
         .from('users')
         .update({
-          avatar_name: fileName,
+          avatar_filename: fileName,
           avatar_url: imagePath,
         })
         .eq('id', user?.id);

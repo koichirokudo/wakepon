@@ -51,6 +51,9 @@ BEFORE INSERT OR UPDATE ON users
 FOR EACH ROW
 EXECUTE FUNCTION update_timestamp();
 
+-- set up storage
+INSERT INTO storage.buckets (id, name) values ('avatars', 'avatars');
+
 -- supabase storage 自分のファイルだけアップロード・取得可能
 CREATE POLICY "Users can manage their own avatar"
 ON storage.objects
