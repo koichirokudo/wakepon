@@ -13,6 +13,7 @@ import { AuthProvider } from './contexts/AuthContext.tsx'
 import Layout from './Layout.tsx'
 import ProtectedRoute from './components/ProtectedRoute.tsx'
 import Rlstest from './pages/Rlstest.tsx';
+import PrivacyPolicy from './pages/PrivacyPolicy.tsx'
 
 import "@fontsource/m-plus-1";
 import "@fontsource/m-plus-1/400.css"; // 通常
@@ -34,6 +35,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
 
           {/* ログイン必須ページは ProtectedRoute で守る */}
           <Route element={<Layout></Layout>}>
+            <Route path='/privacy-policy' element={<PrivacyPolicy/>} />
             <Route path='/categories' element={
               <ProtectedRoute>
                 <Categories />

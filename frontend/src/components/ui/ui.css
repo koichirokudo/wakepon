@@ -218,6 +218,17 @@
   text-decoration: none;
 }
 
+.menu-button {
+  background: none;
+  border: none;
+  color: black;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: clamp(8px, 2vw, 10px);
+  font-weight: bold;
+}
+
 .menu-icon {
   width: clamp(20px, 5vw, 24px);
   height: clamp(20px, 5vw, 24px);
