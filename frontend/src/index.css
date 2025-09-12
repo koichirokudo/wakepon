@@ -9,7 +9,16 @@ html {
 html,
 body,
 * {
-  font-family: 'M PLUS 1', 'ヒラギノ角ゴ ProN W3', 'Hiragino Kaku Gothic ProN', 'メイリオ', 'Meiryo', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
+  font-family:
+    "M PLUS 1",
+    "ヒラギノ角ゴ ProN W3",
+    "Hiragino Kaku Gothic ProN",
+    "メイリオ",
+    "Meiryo",
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif !important;
 }
 
 .main {
@@ -210,7 +219,7 @@ header {
   left: 55%;
   border: none;
   border-radius: 50%;
-  background: #FFF;
+  background: #fff;
   font-size: clamp(1.2rem, 4vw, 1.5rem);
   cursor: pointer;
 }
@@ -268,7 +277,6 @@ header {
   border-left-color: #0288d1;
   color: #01579b;
 }
-
 
 /* === メディアクエリ対応 === */
 
@@ -328,8 +336,6 @@ header {
     background-attachment: scroll;
   }
 }
-
-
 
 /* === メディアクエリによる詳細調整 === */
 
@@ -444,14 +450,12 @@ header {
 }
 
 /* 高解像度ディスプレイ対応 */
-@media (-webkit-min-device-pixel-ratio: 2),
-(min-resolution: 192dpi) {
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
   .user-invite {
     background-image: url("./assets/bg01@2x.png");
     /* 高解像度版があれば */
   }
 }
-
 
 /* アクセシビリティ: アニメーションを減らしたいユーザーへの対応 */
 @media (prefers-reduced-motion: reduce) {
