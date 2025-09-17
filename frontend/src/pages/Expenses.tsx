@@ -1,25 +1,30 @@
 // src/pages/Expenses.tsx
-import { useState, useEffect, useMemo } from 'react';
-import { useAuth } from '../contexts/AuthContext';
-import { supabase } from '../lib/supabaseClient';
-import type { Expense, ExpenseInput, Settlement } from '../types';
-import ExpenseList from '../components/ExpenseList';
-import ExpenseForm from '../components/ExpenseForm';
-import ExpenseSummary from '../components/ExpenseSummary';
+import { useState, useEffect, useMemo } from "react";
+import { useAuth } from "../contexts/AuthContext";
+import { supabase } from "../lib/supabaseClient";
+import type { Expense, ExpenseInput, Settlement } from "../types";
+import ExpenseList from "../components/ExpenseList";
+import ExpenseForm from "../components/ExpenseForm";
+import ExpenseSummary from "../components/ExpenseSummary";
+import "../components/css/Expense.css";
 
 export default function Expenses() {
   const { user, member } = useAuth();
 
   const [expenses, setExpenses] = useState<Expense[]>([]);
-  const [expensesCache, setExpensesCache] = useState<Record<string, Expense[]>>({});
+  const [expensesCache, setExpensesCache] = useState<Record<string, Expense[]>>(
+    {},
+  );
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
-  const [categories, setCategories] = useState<{ id: string; name: string }[]>([]);
+  const [categories, setCategories] = useState<{ id: string; name: string }[]>(
+    [],
+  );
   const [editingExpenseId, setEditingExpenseId] = useState<string | null>(null);
 
   const [selectedMonth, setSelectedMonth] = useState<string>(() => {
     const now = new Date();
-    return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+    return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
   });
 
   // 共通エラー処理
@@ -33,7 +38,9 @@ export default function Expenses() {
     const now = new Date();
     for (let i = 0; i < 12; i++) {
       const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
-      months.push(`${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`);
+      months.push(
+        `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`,
+      );
     }
     return months;
   }, []);
@@ -52,19 +59,19 @@ export default function Expenses() {
       setIsLoading(true);
 
       const startDate = `${selectedMonth}-01`;
-      const [year, month] = selectedMonth.split('-').map(Number);
+      const [year, month] = selectedMonth.split("-").map(Number);
       const endDateObj = new Date(year, month, 1);
       const endDate = endDateObj.toISOString().slice(0, 10);
 
       const { data, error } = await supabase
-        .from('expenses')
+        .from("expenses")
         .select(`id, date, amount, memo, users(name), categories(id, name)`)
-        .gte('date', startDate)
-        .lt('date', endDate)
-        .order('date', { ascending: false });
+        .gte("date", startDate)
+        .lt("date", endDate)
+        .order("date", { ascending: false });
 
       if (error) {
-        handleError('費用の取得に失敗しました', error);
+        handleError("費用の取得に失敗しました", error);
       } else {
         const mapped: Expense[] = (data || []).map((item: any) => ({
           id: item.id,
@@ -75,7 +82,7 @@ export default function Expenses() {
           category: item.categories,
         }));
 
-        setExpensesCache(prev => ({ ...prev, [selectedMonth]: mapped }));
+        setExpensesCache((prev) => ({ ...prev, [selectedMonth]: mapped }));
         setExpenses(mapped);
       }
       setIsLoading(false);
@@ -90,16 +97,18 @@ export default function Expenses() {
 
     const fetchCategories = async () => {
       const { data, error } = await supabase
-        .from('household_categories')
-        .select(`
+        .from("household_categories")
+        .select(
+          `
           categories (
             id,
             name
           )
-        `)
-        .eq('household_id', member.household_id);
+        `,
+        )
+        .eq("household_id", member.household_id);
       if (error) {
-        handleError('カテゴリ取得失敗', error);
+        handleError("カテゴリ取得失敗", error);
       } else {
         const cat = data?.flatMap((d) => d.categories);
         setCategories(cat);
@@ -109,13 +118,16 @@ export default function Expenses() {
   }, [member?.household_id]);
 
   // 月の総支出額
-  const totalAmount = useMemo(() => expenses.reduce((sum, e) => sum + e.amount, 0), [expenses]);
+  const totalAmount = useMemo(
+    () => expenses.reduce((sum, e) => sum + e.amount, 0),
+    [expenses],
+  );
 
   // ユーザー別支払額
   const paidByUser = useMemo(() => {
     const map: Record<string, number> = {};
-    expenses.forEach(exp => {
-      const name = exp.users?.name ?? '不明';
+    expenses.forEach((exp) => {
+      const name = exp.users?.name ?? "不明";
       map[name] = (map[name] || 0) + exp.amount;
     });
     return map;
@@ -128,15 +140,16 @@ export default function Expenses() {
     const perUserShare = total / users.length;
 
     const borrowers = users
-      .map(user => ({ user, diff: perUserShare - (paidByUser[user] || 0) }))
-      .filter(u => u.diff > 0);
+      .map((user) => ({ user, diff: perUserShare - (paidByUser[user] || 0) }))
+      .filter((u) => u.diff > 0);
 
     const lenders = users
-      .map(user => ({ user, diff: (paidByUser[user] || 0) - perUserShare }))
-      .filter(u => u.diff > 0);
+      .map((user) => ({ user, diff: (paidByUser[user] || 0) - perUserShare }))
+      .filter((u) => u.diff > 0);
 
     const result: Settlement[] = [];
-    let i = 0, j = 0;
+    let i = 0,
+      j = 0;
     while (i < borrowers.length && j < lenders.length) {
       const borrower = borrowers[i];
       const lender = lenders[j];
@@ -165,44 +178,48 @@ export default function Expenses() {
   // 支出追加
   const handleAddExpense = async (expense: ExpenseInput) => {
     if (!user || !member) {
-      handleError('グループIDまたはユーザーIDが設定されていません', null);
+      handleError("グループIDまたはユーザーIDが設定されていません", null);
       return;
-    };
+    }
 
     const amt = parseFloat(expense.amount);
     if (Number.isNaN(amt) || amt <= 0) {
-      handleError('金額が不正です', null);
+      handleError("金額が不正です", null);
       return;
     }
 
     const { data, error } = await supabase
-      .from('expenses')
+      .from("expenses")
       .insert({
         household_id: member?.household_id,
         user_id: user?.id,
         date: expense.date,
         amount: amt,
         category_id: expense.categoryId,
-        memo: expense.memo
+        memo: expense.memo,
       })
       .select(`id, date, amount, memo, categories(id, name)`)
       .single();
 
-    if (error) handleError('支出追加失敗', error);
+    if (error) handleError("支出追加失敗", error);
     else if (data) {
       const newExpense: Expense = {
         id: data.id,
         date: data.date,
         amount: data.amount,
         memo: data.memo,
-        users: { name: user.name ?? '不明' },
-        category: Array.isArray(data.categories) ? data.categories[0] : data.categories,
+        users: { name: user.name ?? "不明" },
+        category: Array.isArray(data.categories)
+          ? data.categories[0]
+          : data.categories,
       };
 
-      setExpenses(prev => {
-        const updated = [...prev, newExpense].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+      setExpenses((prev) => {
+        const updated = [...prev, newExpense].sort(
+          (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
+        );
         // キャッシュも更新
-        setExpensesCache(cache => ({ ...cache, [selectedMonth]: updated }));
+        setExpensesCache((cache) => ({ ...cache, [selectedMonth]: updated }));
         return updated;
       });
     }
@@ -213,44 +230,46 @@ export default function Expenses() {
     if (!editingExpenseId) return;
 
     if (!user || !member) {
-      handleError('グループIDまたはユーザーIDが設定されていません', null);
+      handleError("グループIDまたはユーザーIDが設定されていません", null);
       return;
-    };
+    }
 
     const amt = parseFloat(expense.amount);
     if (Number.isNaN(amt) || amt <= 0) {
-      handleError('金額が不正です', null);
+      handleError("金額が不正です", null);
       return;
     }
 
     const { data, error } = await supabase
-      .from('expenses')
+      .from("expenses")
       .update({
         date: expense.date,
         amount: amt,
         category_id: expense.categoryId,
         memo: expense.memo,
       })
-      .eq('id', editingExpenseId)
+      .eq("id", editingExpenseId)
       .select(`id, date, amount, memo, categories(id, name)`)
       .single();
 
     if (error) {
-      handleError('支出更新失敗', error);
+      handleError("支出更新失敗", error);
     } else if (data) {
-      setExpenses(prev => {
-        const updated = prev.map(exp =>
+      setExpenses((prev) => {
+        const updated = prev.map((exp) =>
           exp.id === editingExpenseId
             ? {
-              ...exp,
-              date: data.date,
-              amount: data.amount,
-              memo: data.memo,
-              category: Array.isArray(data.categories) ? data.categories[0] : data.categories,
-            }
-            : exp
+                ...exp,
+                date: data.date,
+                amount: data.amount,
+                memo: data.memo,
+                category: Array.isArray(data.categories)
+                  ? data.categories[0]
+                  : data.categories,
+              }
+            : exp,
         );
-        setExpensesCache(cache => ({ ...cache, [selectedMonth]: updated }));
+        setExpensesCache((cache) => ({ ...cache, [selectedMonth]: updated }));
         return updated;
       });
       cancelEdit();
@@ -259,55 +278,88 @@ export default function Expenses() {
 
   // 支出削除
   const handleDeleteExpense = async (id: string) => {
-    if (!confirm('本当に削除しますか？')) return;
+    if (!confirm("本当に削除しますか？")) return;
 
-    const { error } = await supabase.from('expenses').delete().eq('id', id);
+    const { error } = await supabase.from("expenses").delete().eq("id", id);
     if (error) {
-      handleError('支出削除失敗', error);
+      handleError("支出削除失敗", error);
     } else {
-      setExpenses(prev => {
-        const updated = prev.filter(e => e.id !== id);
-        setExpensesCache(cache => ({ ...cache, [selectedMonth]: updated }));
+      setExpenses((prev) => {
+        const updated = prev.filter((e) => e.id !== id);
+        setExpensesCache((cache) => ({ ...cache, [selectedMonth]: updated }));
         return updated;
       });
     }
   };
 
-  const expenseToEdit = expenses.find(e => e.id === editingExpenseId);
+  const expenseToEdit = expenses.find((e) => e.id === editingExpenseId);
 
   return (
-    <>
-      <div>
-        <h1>支出入力</h1>
-        <ExpenseForm
-          expenseToEdit={expenseToEdit}
-          categories={categories}
-          editing={!!editingExpenseId}
-          onSubmit={(data) => {
-            if (editingExpenseId) {
-              handleUpdateExpense(data);
-            } else {
-              handleAddExpense(data);
-            }
-          }}
-          onCancel={cancelEdit}
-        />
-      </div>
-      <div>
-        <h1>支出集計</h1>
-        <ExpenseSummary selectedMonth={selectedMonth} totalAmount={totalAmount} paidByUser={paidByUser} settlements={settlements} />
-      </div>
+    <div className="expense">
+      {/* 支出入力 */}
+      <div className="container">
+        <div className="expense-card" style={{ }}>
+          <div className="expense-card-header">支出入力</div>
+          <div className="expense-card-body">
+            <ExpenseForm
+              expenseToEdit={expenseToEdit}
+              categories={categories}
+              editing={!!editingExpenseId}
+              onSubmit={(data) => {
+                if (editingExpenseId) {
+                  handleUpdateExpense(data);
+                } else {
+                  handleAddExpense(data);
+                }
+              }}
+              onCancel={cancelEdit}
+            />
+          </div>
+        </div>
 
-      <div>
-        <h1>支出一覧</h1>
-        <label htmlFor="month-select">月を選択:</label>
-        <select value={selectedMonth} onChange={e => setSelectedMonth(e.target.value)}>
-          {pastYearMonths.map(m => <option key={m} value={m}>{m}</option>)}
-        </select>
-        <br /><br />
-        {isLoading ? <p>読み込み中...</p> : <ExpenseList expenses={expenses} onEdit={startEditExpense} onDelete={handleDeleteExpense} />}
-      </div>
+        {/* 支出管理 */}
+        <div className="expense-card">
+          <div className="expense-card-header">支出管理</div>
+          <div className="expense-card-body">
+            {/* 月選択 */}
+            <div className="month-selector">
+              <label htmlFor="month-select">表示月:</label>
+              <select
+                value={selectedMonth}
+                onChange={(e) => setSelectedMonth(e.target.value)}
+              >
+                {pastYearMonths.map((m) => (
+                  <option key={m} value={m}>
+                    {m.replace('-', '/')}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-    </>
+            {/* 集計サマリー*/}
+            <ExpenseSummary
+              selectedMonth={selectedMonth}
+              totalAmount={totalAmount}
+              paidByUser={paidByUser}
+              settlements={settlements}
+            />
+          </div>
+
+          {/* 支出一覧 */}
+          <div style={{ marginTop: '10px' }}>
+            <h3 style={{ fontWeight: 'bold', marginBottom: 'clamp(8px, 2vw, 12px)' }}>支出一覧</h3>
+            {isLoading ? (
+              <p>読み込み中...</p>
+            ) : (
+              <ExpenseList
+                expenses={expenses}
+                onEdit={startEditExpense}
+                onDelete={handleDeleteExpense}
+              />
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }

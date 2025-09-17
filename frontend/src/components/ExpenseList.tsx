@@ -7,33 +7,32 @@ type ExpenseListProps = {
 };
 
 export default function ExpenseList({ expenses, onEdit, onDelete }: ExpenseListProps) {
+
+  // 空の状態の処理
+  if (expenses.length === 0) {
+    return (
+      <div className="expense-list-empty">
+        <div className="expense-list-empty-icon">📝</div>
+        <p>まだ支出が記録されていません</p>
+      </div>
+    );
+  }
+
   return (
-    <table border={1} style={{ borderCollapse: "collapse", width: "100%" }}>
-      <thead>
-        <tr>
-          <th>日付</th>
-          <th>カテゴリ</th>
-          <th style={{ textAlign: "right" }}>金額</th>
-          <th>メモ</th>
-          <th>ユーザー</th>
-          <th>操作</th>
-        </tr>
-      </thead>
-      <tbody>
-        {expenses.map((expense) => (
-          <tr key={expense.id}>
-            <td>{new Date(expense.date).toLocaleDateString("ja-JP")}</td>
-            <td>{expense.category?.name}</td>
-            <td style={{ textAlign: "right" }}>{expense.amount.toLocaleString()}円</td>
-            <td>{expense.memo}</td>
-            <td>{expense.users?.name}</td>
-            <td>
-              <button onClick={() => onEdit(expense)}>編集</button>
-              <button onClick={() => onDelete(expense.id)}>削除</button>
-            </td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
+    <div id="expense-list">
+      {expenses.map((expense) =>(
+        <div key={expense.id} className="expense-item">
+          <div className="expense-info">
+            <div className="expense-date">{new Date(expense.date).toLocaleDateString("ja-JP")}</div>
+            <div className="expense-amount">{expense.amount.toLocaleString()}円</div>
+            <div className="expense-category">{expense.category?.name}</div>
+            <div className="expense-memo">{expense?.memo}</div>
+            <div className="expense-user">{expense.users?.name}</div>
+          </div>
+          <button className="button button-sm button-secondary" onClick={() => onEdit(expense)}>編集</button>
+          <button className="button button-sm button-danger" onClick={() => onDelete(expense.id)}>削除</button>
+        </div>
+      ))}
+    </div>
   );
 }

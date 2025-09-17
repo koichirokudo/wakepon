@@ -12,7 +12,6 @@ import VerifyOtp from './pages/VerifyOtp.tsx'
 import { AuthProvider } from './contexts/AuthContext.tsx'
 import Layout from './Layout.tsx'
 import ProtectedRoute from './components/ProtectedRoute.tsx'
-import Rlstest from './pages/Rlstest.tsx';
 import PrivacyPolicy from './pages/PrivacyPolicy.tsx'
 
 import "@fontsource/m-plus-1";
@@ -54,11 +53,6 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
             <Route path='/' element={
               <ProtectedRoute>
                 <Expenses />
-              </ProtectedRoute>
-            } />
-            <Route path='/rlstest' element={
-              <ProtectedRoute>
-                <Rlstest />
               </ProtectedRoute>
             } />
           </Route>

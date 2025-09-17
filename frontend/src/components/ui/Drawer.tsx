@@ -20,16 +20,20 @@ export default function Drawer({ isOpen, setIsOpen }: { isOpen: boolean, setIsOp
       // ドロワーが開いているときはスクロールを無効化
       document.body.style.overflow = 'hidden';
       // ドロワーが開いているときはハンバーガーーメニューを非表示
+      const header = document.querySelector('header') as HTMLElement;
       const hamburger = document.querySelector('.hamburger') as HTMLElement;
-      if (hamburger) {
+      if (header && hamburger) {
+        header.style.display = 'none';
         hamburger.style.display = 'none';
       }
     } else {
       // ドロワーが閉じているときはスクロールを有効化
       document.body.style.overflow = 'auto';
       // ドロワーが閉じているときはハンバーガーメニューを表示
+      const header = document.querySelector('header') as HTMLElement;
       const hamburger = document.querySelector('.hamburger') as HTMLElement;
-      if (hamburger) {
+      if (header && hamburger) {
+        header.style.display = 'block';
         hamburger.style.display = 'block';
       }
     }

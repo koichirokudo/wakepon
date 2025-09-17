@@ -3,6 +3,9 @@ import { useForm } from 'react-hook-form';
 import { useEffect } from 'react';
 import { validationRules } from '../utils/validation';
 import type { Expense, ExpenseInput } from '../types';
+import '../components/css/Expense.css';
+import Input from './ui/Input';
+import Select from './ui/Select';
 
 type ExpenseFormProps = {
   expenseToEdit?: Expense;
@@ -61,39 +64,37 @@ export default function ExpenseForm({ expenseToEdit, categories, editing = false
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
-      {/* 日付 */}
-      <input type="date"
+    <form id="expense-form" onSubmit={handleSubmit(onSubmit)}>
+      <Input
+        type="date"
+        label="日付"
+        error={errors.date?.message}
         {...register("date", validationRules.expenseDate)}
-        placeholder="日付"
-      /><br />
-      {errors.date && <p style={{ color: 'red' }}>{errors.date.message}</p>}
-      {/* 金額 */}
-      <input type="number"
+      />
+      <Input
+        type="number"
+        error={errors.amount?.message}
+        label="金額"
         {...register("amount", validationRules.expenseAmount)}
-        placeholder="金額"
-      /><br />
-      {errors.amount && <p style={{ color: 'red' }}>{errors.amount.message}</p>}
-      {/* カテゴリ */}
-      <select {...register("categoryId")}>
-        <option value="">カテゴリを選択</option>
-        {categories.map((cat) => (
-          <option key={cat.id} value={cat.id}>{cat.name}</option>
-        ))}
-      </select><br />
+      />
+      <Select 
+        label="カテゴリ"
+        error={errors.categoryId?.message}
+        values={categories}
+      />
       {errors.categoryId && <p style={{ color: 'red' }}>{errors.categoryId.message}</p>}
-      {/* メモ */}
-      <input {
-        ...register("memo", validationRules.memo)}
-        placeholder="メモ" /><br />
-      {errors.memo && <p style={{ color: 'red' }}>{errors.memo.message}</p>}
+      <Input
+        label="メモ"
+        error={errors.memo?.message}
+        {...register("memo", validationRules.memo)}
+      />
       {editing ? (
         <>
-          <button type="submit">保存</button>
-          <button type="button" onClick={handleCancel}>キャンセル</button>
+          <button type="submit" className="button button-sm button-secondary">保存</button>
+          <button type="button" className="button button-sm button-danger" onClick={handleCancel}>キャンセル</button>
         </>
       ) : (
-        <button type="submit">追加</button>
+        <button type="submit" className="button button-primary">追加</button>
       )}
       <br />
     </form>
