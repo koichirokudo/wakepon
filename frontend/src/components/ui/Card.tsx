@@ -1,4 +1,3 @@
-import "./ui.css";
 import React from "react";
 
 type CardProps = {

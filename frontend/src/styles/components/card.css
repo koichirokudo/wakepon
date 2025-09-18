@@ -1,0 +1,143 @@
+/* === カードコンポーネント === */
+
+.card {
+  position: fixed;
+  top: 30%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: var(--card-max-width);
+  min-height: fit-content;
+  max-height: 90vh;
+  overflow-y: auto;
+  background-color: var(--color-bg-primary);
+  border-radius: var(--border-radius-xl);
+  box-shadow: var(--shadow-lg);
+  padding: var(--spacing-lg);
+  transition: transform var(--transition-fast);
+  z-index: var(--z-index-modal);
+}
+
+.card-header {
+  font-size: var(--font-size-2xl);
+  font-weight: bold;
+  margin-bottom: var(--spacing-xl);
+  text-align: left;
+  color: var(--color-text-primary);
+}
+
+.card-body {
+  font-size: var(--font-size-base);
+  color: var(--color-text-primary);
+  line-height: 1.5;
+}
+
+.card-footer {
+  margin-top: var(--spacing-sm);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  text-align: center;
+}
+
+/* === Expense専用カード === */
+.expense-card {
+  margin-top: 24px;
+  background-color: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(6px);
+  border-radius: var(--border-radius-xl);
+  box-shadow: var(--shadow-lg);
+  padding: var(--spacing-lg);
+  transition: transform var(--transition-fast);
+  min-height: fit-content;
+  max-height: 50vh;
+  overflow-y: auto;
+  position: relative;
+  top: auto;
+  left: auto;
+  transform: none;
+  width: 100%;
+}
+
+.expense-card-header {
+  font-size: var(--font-size-2xl);
+  font-weight: bold;
+  margin-bottom: var(--spacing-xl);
+  text-align: left;
+  color: var(--color-text-primary);
+  border-bottom: 2px solid var(--color-primary);
+  padding-bottom: 0.5rem;
+}
+
+.expense-card-body {
+  font-size: var(--font-size-base);
+  color: var(--color-text-primary);
+  line-height: 1.5;
+}
+
+.expense-card-footer {
+  margin-top: var(--spacing-sm);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  text-align: center;
+  position: relative;
+}
+
+/* === Categories専用カード === */
+.categories .card {
+  position: relative;
+  top: auto;
+  left: auto;
+  transform: none;
+  margin-bottom: var(--spacing-xl);
+  width: min(95vw, 500px);
+  max-width: 500px;
+}
+
+/* === レスポンシブ対応 === */
+@media (max-width: 480px) {
+  .card {
+    width: 95vw;
+    padding: var(--spacing-md);
+    border-radius: var(--border-radius-lg);
+  }
+
+  .categories .card {
+    width: 95vw;
+    margin-bottom: var(--spacing-md);
+  }
+}
+
+@media (min-width: 481px) and (max-width: 768px) {
+  .card {
+    width: min(80vw, 400px);
+  }
+}
+
+@media (min-width: 769px) {
+  .card {
+    width: min(400px, 90vw);
+  }
+}
+
+@media (max-height: 600px) and (orientation: landscape) {
+  .card {
+    max-height: 95vh;
+    padding: var(--spacing-sm) var(--spacing-md);
+  }
+
+  .card-header {
+    font-size: 1.4rem;
+    margin-bottom: 0.8rem;
+  }
+
+  .categories .card {
+    margin-bottom: var(--spacing-sm);
+  }
+}
+
+/* === アクセシビリティ対応 === */
+@media (prefers-reduced-motion: reduce) {
+  .card,
+  .expense-card {
+    transition: none;
+  }
+}

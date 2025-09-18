@@ -1,6 +1,5 @@
 import type React from "react";
 import { forwardRef } from "react";
-import './ui.css';
 
 // React.InputHTMLAttributes: React が提供している汎用的な型
 // HTMLInputElement: ブラウザの組み込み型

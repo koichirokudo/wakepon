@@ -6,7 +6,6 @@ import { nanoid } from 'nanoid';
 import type { InviteInput } from '../types';
 import Card from '../components/ui/Card';
 import { CardHeader, CardBody, CardFooter } from '../components/ui/Card';
-import '../index.css';
 import { useForm } from 'react-hook-form';
 import Input from '../components/ui/Input';
 import Button from '../components/ui/Button';

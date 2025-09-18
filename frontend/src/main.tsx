@@ -2,7 +2,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
-import './index.css'
+import './styles/index.css'
 import Categories from './pages/Categories.tsx'
 import Expenses from './pages/Expenses.tsx'
 import SignIn from './pages/SignIn.tsx'
@@ -19,9 +19,6 @@ import "@fontsource/m-plus-1/400.css"; // 通常
 import "@fontsource/m-plus-1/700.css"; // 太字
 
 import 'normalize.css';
-import './reset.css';
-
-import './index.css';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>

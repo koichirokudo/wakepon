@@ -34,14 +34,10 @@ export default function Profile() {
 
   // 画像アップロードフォーム
   const [uploadedImageUrl, setUploadedImageUrl] = useState<string>(user?.avatar_url || '');
-  const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const {
-    register: registerImage,
-    handleSubmit: handleSubmitImage,
     control,
-    reset: resetImage,
-    formState: { errors: imageError }
+    reset: resetImage
   } = useForm<ImageUploadForm>();
 
   // アイコンボタンからファイル選択を開く

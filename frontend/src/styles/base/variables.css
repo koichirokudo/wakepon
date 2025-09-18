@@ -1,0 +1,115 @@
+/* === CSS変数定義 === */
+
+:root {
+  /* === カラーパレット === */
+  --color-primary: #F76E6E;
+  --color-primary-hover: #FF8095;
+  --color-primary-light: rgba(247, 110, 110, 0.1);
+  --color-primary-shadow: rgba(247, 110, 110, 0.3);
+
+  --color-secondary: #e5e7eb;
+  --color-secondary-hover: #d1d5db;
+
+  --color-danger: #dc2626;
+  --color-danger-hover: #b91c1c;
+
+  --color-success: #059669;
+  --color-success-bg: #ecfdf5;
+  --color-success-border: #bbf7d0;
+
+  --color-error: #dc2626;
+  --color-error-bg: #fee2e2;
+  --color-error-border: #fecaca;
+
+  --color-info: #0288d1;
+  --color-info-bg: #e0f2fe;
+  --color-info-border: #0288d1;
+
+  /* === テキストカラー === */
+  --color-text-primary: #333;
+  --color-text-secondary: #666;
+  --color-text-muted: #9ca3af;
+  --color-text-white: #FFFF;
+  --color-text-black: #111827;
+
+  /* === ボーダーカラー === */
+  --color-border: #e5e7eb;
+  --color-border-light: #f3f4f6;
+  --color-border-dark: #d1d5db;
+  --color-border-focus: rgba(59, 130, 246, 0.5);
+
+  /* === 背景色 === */
+  --color-bg-primary: #ffffff;
+  --color-bg-secondary: #f9f9f9;
+  --color-bg-muted: #fafafa;
+  --color-bg-overlay: rgba(0, 0, 0, 0.5);
+  --color-bg-gradient: linear-gradient(135deg, #F76E6E 0%, #FF8095 100%);
+  --color-bg-gradient-light: linear-gradient(135deg, rgba(247, 110, 110, 0.05) 0%, rgba(255, 128, 149, 0.05) 100%);
+
+  /* === スペーシング === */
+  --spacing-xs: clamp(4px, 1vw, 6px);
+  --spacing-sm: clamp(8px, 2vw, 12px);
+  --spacing-md: clamp(12px, 3vw, 16px);
+  --spacing-lg: clamp(16px, 4vw, 20px);
+  --spacing-xl: clamp(20px, 5vw, 30px);
+  --spacing-2xl: clamp(30px, 8vw, 40px);
+  --spacing-3xl: clamp(40px, 10vw, 60px);
+
+  /* === フォントサイズ === */
+  --font-size-xs: clamp(0.75rem, 2vw, 0.875rem);
+  --font-size-sm: clamp(0.8rem, 2vw, 0.9rem);
+  --font-size-base: clamp(0.9rem, 2.5vw, 1rem);
+  --font-size-lg: clamp(1rem, 3vw, 1.1rem);
+  --font-size-xl: clamp(1.2rem, 4vw, 1.5rem);
+  --font-size-2xl: clamp(1.4rem, 5vw, 1.8rem);
+  --font-size-3xl: clamp(2rem, 6vw, 3rem);
+
+  /* === ボーダー半径 === */
+  --border-radius-sm: 4px;
+  --border-radius-md: 6px;
+  --border-radius-lg: 8px;
+  --border-radius-xl: 12px;
+  --border-radius-full: 50%;
+
+  /* === シャドウ === */
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 3px 8px 7px 2px rgba(0, 0, 0, 0.1);
+  --shadow-primary: 0 2px 8px var(--color-primary-shadow);
+  --shadow-primary-hover: 0 4px 12px rgba(247, 110, 110, 0.4);
+
+  /* === Z-index === */
+  --z-index-dropdown: 100;
+  --z-index-sticky: 200;
+  --z-index-fixed: 300;
+  --z-index-overlay: 999;
+  --z-index-modal: 1000;
+  --z-index-drawer: 1001;
+
+  /* === トランジション === */
+  --transition-fast: 0.2s ease;
+  --transition-normal: 0.3s ease;
+  --transition-slow: 0.5s ease;
+
+  /* === ブレークポイント === */
+  --breakpoint-sm: 480px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 1024px;
+  --breakpoint-xl: 1200px;
+
+  /* === コンテナサイズ === */
+  --container-max-width: 1480px;
+  --card-max-width: min(90vw, 400px);
+  --drawer-width: clamp(200px, 60vw, 220px);
+
+  /* === インプットサイズ === */
+  --input-height: clamp(35px, 8vw, 40px);
+  --input-height-lg: clamp(40px, 10vw, 50px);
+  --input-padding: clamp(0.25rem, 2vw, 0.375rem);
+
+  /* === ボタンパディング === */
+  --button-padding-sm: clamp(0.25rem, 2vw, 0.375rem) clamp(0.5rem, 3vw, 0.75rem);
+  --button-padding-md: clamp(0.375rem, 2.5vw, 0.5rem) clamp(0.75rem, 4vw, 1rem);
+  --button-padding-lg: clamp(0.5rem, 3vw, 0.75rem) clamp(1rem, 5vw, 1.5rem);
+  --button-padding-bg: clamp(0.5rem, 3vw, 0.65rem) clamp(2rem, 8vw, 4.3rem);
+}

@@ -6,8 +6,6 @@ import { useAuth } from '../contexts/AuthContext';
 import CategoryList from '../components/CategoryList';
 import SelectCategoryForm from '../components/SelectCategoryForm';
 import Card, { CardHeader, CardBody } from '../components/ui/Card';
-import '../index.css';
-import '../components/css/Categories.css';
 
 export default function Categories() {
   const { member } = useAuth();

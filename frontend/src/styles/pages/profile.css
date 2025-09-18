@@ -1,0 +1,122 @@
+/* === プロフィール画面 === */
+
+.profile {
+  background-image: url("../../assets/bg02.png");
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: 10% 90%;
+  background-attachment: fixed;
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-height: 100vh;
+  background-color: var(--color-bg-secondary);
+  padding: var(--spacing-lg);
+  box-sizing: border-box;
+}
+
+/* === プロフィール表示 === */
+.profile-display {
+  height: 74px;
+}
+
+.profile-field label {
+  color: var(--color-text-secondary);
+  display: block;
+  text-align: left;
+  margin-bottom: var(--spacing-sm);
+  font-size: var(--font-size-base);
+}
+
+.field-value {
+  position: relative;
+  color: var(--color-text-primary);
+}
+
+/* === プロフィール画像 === */
+.profile-image {
+  position: relative;
+  text-align: center;
+}
+
+.avatar {
+  width: 100px;
+  height: 100px;
+  border-radius: var(--border-radius-full);
+  object-fit: cover;
+  border: 3px solid var(--color-border);
+}
+
+.avatar-change-btn {
+  position: absolute;
+  top: 75%;
+  left: 55%;
+  border: none;
+  border-radius: var(--border-radius-full);
+  background: var(--color-bg-primary);
+  font-size: var(--font-size-xl);
+  cursor: pointer;
+  padding: var(--spacing-xs);
+  box-shadow: var(--shadow-sm);
+  transition: transform var(--transition-fast);
+}
+
+.avatar-change-btn:hover {
+  transform: scale(1.1);
+}
+
+/* === 編集関連 === */
+.edit-toggle-btn {
+  position: absolute;
+  right: 0.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  border: none;
+  background: transparent;
+  font-size: var(--font-size-xl);
+  cursor: pointer;
+  padding: var(--spacing-xs);
+  border-radius: var(--border-radius-sm);
+  transition: background-color var(--transition-fast);
+}
+
+.edit-toggle-btn:hover {
+  background-color: var(--color-bg-muted);
+}
+
+/* === レスポンシブ対応 === */
+@media (max-width: 480px) {
+  .profile {
+    padding: var(--spacing-md);
+    background-attachment: scroll;
+  }
+}
+
+@media (min-width: 481px) and (max-width: 768px) {
+  .profile {
+    padding: var(--spacing-lg);
+  }
+}
+
+@media (max-height: 600px) and (orientation: landscape) {
+  .profile {
+    min-height: 100vh;
+    align-items: flex-start;
+    padding-top: 60px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .profile {
+    background-attachment: scroll;
+  }
+
+  .avatar-change-btn,
+  .edit-toggle-btn {
+    transition: none;
+  }
+
+  .avatar-change-btn:hover {
+    transform: none;
+  }
+}

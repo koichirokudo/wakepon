@@ -1,0 +1,145 @@
+/* === ボタンコンポーネント === */
+
+.button-base {
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  font-size: var(--font-size-base);
+  font-weight: bold;
+  letter-spacing: 1.6px;
+  border: none;
+  border-radius: var(--border-radius-sm);
+  margin-top: var(--spacing-sm);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+}
+
+.button-base:focus {
+  outline: none;
+}
+
+.button-base:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* === バリアント === */
+.button-primary {
+  background-color: var(--color-primary);
+  color: var(--color-text-white);
+}
+
+.button-primary:hover:not(:disabled) {
+  background-color: var(--color-primary-hover);
+  transform: translateY(-1px);
+}
+
+.button-primary:focus {
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.5);
+}
+
+.button-secondary {
+  background-color: var(--color-secondary);
+  color: var(--color-text-black);
+  border: 1px solid var(--color-border-dark);
+}
+
+.button-secondary:hover:not(:disabled) {
+  background-color: var(--color-secondary-hover);
+  transform: translateY(-1px);
+}
+
+.button-secondary:focus {
+  box-shadow: 0 0 0 3px rgba(107, 114, 128, 0.5);
+}
+
+.button-danger {
+  background-color: var(--color-danger);
+  color: var(--color-text-white);
+  border: 1px solid var(--color-danger-hover);
+}
+
+.button-danger:hover:not(:disabled) {
+  background-color: var(--color-danger-hover);
+  transform: translateY(-1px);
+}
+
+.button-danger:focus {
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.5);
+}
+
+/* === サイズ === */
+.button-sm {
+  padding: var(--button-padding-sm);
+  font-size: var(--font-size-xs);
+  border-radius: var(--border-radius-md);
+  min-width: 50px;
+  white-space: nowrap;
+}
+
+.button-md {
+  padding: var(--button-padding-md);
+  font-size: var(--font-size-base);
+}
+
+.button-lg {
+  padding: var(--button-padding-lg);
+  font-size: var(--font-size-lg);
+}
+
+.button-bg {
+  padding: var(--button-padding-bg);
+  font-size: var(--font-size-lg);
+}
+
+/* === アイコンボタン === */
+.icon-button {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  transition: transform var(--transition-fast);
+  padding: var(--spacing-xs);
+}
+
+.icon-button:hover {
+  transform: scale(1.1);
+}
+
+.icon-button:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--color-border-focus);
+  border-radius: var(--border-radius-sm);
+}
+
+/* === レスポンシブ対応 === */
+@media (max-width: 480px) {
+  .button-bg {
+    padding: 0.6rem 1.5rem;
+    width: 100%;
+    font-size: 1rem;
+  }
+
+  .button-sm {
+    width: 100%;
+    margin: 2px 0;
+  }
+}
+
+/* === アクセシビリティ対応 === */
+@media (prefers-reduced-motion: reduce) {
+  .button-base,
+  .icon-button {
+    transition: none;
+  }
+
+  .button-primary:hover,
+  .button-secondary:hover,
+  .button-danger:hover {
+    transform: none;
+  }
+
+  .icon-button:hover {
+    transform: none;
+  }
+}

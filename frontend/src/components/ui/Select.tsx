@@ -1,6 +1,5 @@
 import type React from "react";
 import { forwardRef } from "react";
-import './ui.css';
 
 interface SelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
   label?: string;

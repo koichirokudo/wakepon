@@ -1,6 +1,5 @@
 import type React from "react";
 import { forwardRef } from "react";
-import './ui.css';
 
 type ButtonVariant = 'primary' | 'secondary' | 'danger';
 type ButtonSize = 'sm' | 'md' | 'lg' | 'bg';

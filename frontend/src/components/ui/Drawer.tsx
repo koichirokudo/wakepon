@@ -1,6 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
-import "./ui.css";
 import HambergerIcon from "../../assets/humberger.png"
 import HomeIcon from "../../assets/home.png";
 import CategoriesIcon from "../../assets/category.png";

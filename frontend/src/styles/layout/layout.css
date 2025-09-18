@@ -1,0 +1,121 @@
+/* === レイアウト全般 === */
+
+.main {
+  transition: margin-left var(--transition-normal);
+  font-size: var(--font-size-base);
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+.main.shift {
+  margin-left: var(--drawer-width);
+}
+
+/* === コンテナ === */
+.container {
+  max-width: var(--container-max-width);
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-xl);
+  padding: 0 var(--spacing-md);
+}
+
+/* === ページラッパー === */
+.page-wrapper {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--spacing-lg);
+  box-sizing: border-box;
+}
+
+/* === フォームアクション === */
+.form-actions {
+  text-align: center;
+  margin-top: var(--spacing-xl);
+}
+
+/* === 空の状態 === */
+.empty-state {
+  text-align: center;
+  padding: var(--spacing-3xl);
+  color: var(--color-text-secondary);
+}
+
+.empty-state-icon {
+  font-size: var(--font-size-3xl);
+  margin-bottom: var(--spacing-lg);
+  opacity: 0.3;
+}
+
+.empty-message {
+  font-size: var(--font-size-lg);
+  margin-bottom: var(--spacing-md);
+  color: var(--color-primary);
+  font-weight: bold;
+}
+
+.empty-icon {
+  font-size: var(--font-size-3xl);
+  opacity: 0.5;
+}
+
+/* === ユーティリティクラス === */
+.text-center { text-align: center; }
+.text-left { text-align: left; }
+.text-right { text-align: right; }
+
+.flex { display: flex; }
+.flex-col { flex-direction: column; }
+.flex-row { flex-direction: row; }
+.items-center { align-items: center; }
+.justify-center { justify-content: center; }
+.justify-between { justify-content: space-between; }
+
+.w-full { width: 100%; }
+.h-full { height: 100%; }
+
+.mt-1 { margin-top: var(--spacing-xs); }
+.mt-2 { margin-top: var(--spacing-sm); }
+.mt-3 { margin-top: var(--spacing-md); }
+.mt-4 { margin-top: var(--spacing-lg); }
+.mt-5 { margin-top: var(--spacing-xl); }
+
+.mb-1 { margin-bottom: var(--spacing-xs); }
+.mb-2 { margin-bottom: var(--spacing-sm); }
+.mb-3 { margin-bottom: var(--spacing-md); }
+.mb-4 { margin-bottom: var(--spacing-lg); }
+.mb-5 { margin-bottom: var(--spacing-xl); }
+
+.p-1 { padding: var(--spacing-xs); }
+.p-2 { padding: var(--spacing-sm); }
+.p-3 { padding: var(--spacing-md); }
+.p-4 { padding: var(--spacing-lg); }
+.p-5 { padding: var(--spacing-xl); }
+
+/* === アニメーション === */
+@keyframes float {
+  0% {
+    transform: rotate(-20deg) translateY(0);
+  }
+  50% {
+    transform: rotate(-25deg) translateY(clamp(-8px, -2vw, -10px));
+  }
+  100% {
+    transform: rotate(-20deg) translateY(0);
+  }
+}
+
+.heart {
+  position: absolute;
+  bottom: clamp(50px, 12vw, 85px);
+  left: clamp(8px, 2.5vw, 15px);
+  height: clamp(15px, 4vw, 20px);
+  width: clamp(15px, 4vw, 20px);
+  object-fit: contain;
+  transform: rotate(-20deg);
+  animation: float 3s ease-in-out infinite;
+  z-index: 1;
+}

@@ -1,0 +1,138 @@
+/* === レスポンシブ共通設定 === */
+
+/* === グリッドレスポンシブ === */
+@media (min-width: 768px) {
+  .container {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (min-width: 1024px) {
+  .container {
+    grid-template-columns: 1fr 2fr;
+  }
+}
+
+/* === メインレイアウトシフト === */
+@media (max-width: 480px) {
+  .main.shift {
+    margin-left: 80vw;
+  }
+}
+
+@media (min-width: 481px) and (max-width: 768px) {
+  .main.shift {
+    margin-left: 280px;
+  }
+}
+
+@media (min-width: 769px) {
+  .main.shift {
+    margin-left: 220px;
+  }
+}
+
+/* === スマートフォン対応 (480px以下) === */
+@media (max-width: 480px) {
+  .page-wrapper {
+    padding: var(--spacing-md) var(--spacing-sm);
+  }
+
+  .container {
+    gap: var(--spacing-md);
+    padding: 0 var(--spacing-sm);
+  }
+
+  .empty-state {
+    padding: var(--spacing-xl);
+  }
+
+  .empty-state-icon {
+    font-size: var(--font-size-2xl);
+  }
+}
+
+/* === タブレット対応 (481px - 768px) === */
+@media (min-width: 481px) and (max-width: 768px) {
+  .page-wrapper {
+    padding: var(--spacing-lg) var(--spacing-md);
+  }
+}
+
+/* === 横向きモバイル対応 === */
+@media (max-height: 600px) and (orientation: landscape) {
+  .page-wrapper {
+    min-height: 100vh;
+    align-items: flex-start;
+    padding-top: 60px;
+  }
+
+  .empty-state {
+    padding: var(--spacing-lg);
+  }
+
+  .heart {
+    bottom: 35px;
+    width: 14px;
+    height: 14px;
+  }
+}
+
+/* === 高解像度ディスプレイ対応 === */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  /* 高解像度用の背景画像があれば設定 */
+}
+
+/* === アクセシビリティ対応 === */
+@media (prefers-reduced-motion: reduce) {
+  .heart {
+    animation: none;
+  }
+
+  .main {
+    transition: none;
+  }
+
+  * {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+
+/* === 印刷対応 === */
+@media print {
+  .page-wrapper {
+    background: white;
+    min-height: auto;
+  }
+
+  .heart {
+    display: none;
+  }
+
+  .main {
+    margin-left: 0 !important;
+  }
+
+  .drawer,
+  .overlay,
+  .hamburger {
+    display: none !important;
+  }
+}
+
+/* === 高コントラスト対応 === */
+@media (prefers-contrast: high) {
+  .empty-state-icon {
+    opacity: 0.8;
+  }
+
+  .empty-icon {
+    opacity: 0.8;
+  }
+}
+
+/* === ダークモード対応（将来の拡張用） === */
+@media (prefers-color-scheme: dark) {
+  /* ダークモード用の色設定を追加可能 */
+}

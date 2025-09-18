@@ -6,7 +6,6 @@ import type { Expense, ExpenseInput, Settlement } from "../types";
 import ExpenseList from "../components/ExpenseList";
 import ExpenseForm from "../components/ExpenseForm";
 import ExpenseSummary from "../components/ExpenseSummary";
-import "../components/css/Expense.css";
 
 export default function Expenses() {
   const { user, member } = useAuth();

@@ -3,7 +3,6 @@ import { useForm } from 'react-hook-form';
 import { useEffect } from 'react';
 import { validationRules } from '../utils/validation';
 import type { Expense, ExpenseInput } from '../types';
-import '../components/css/Expense.css';
 import Input from './ui/Input';
 import Select from './ui/Select';
 
