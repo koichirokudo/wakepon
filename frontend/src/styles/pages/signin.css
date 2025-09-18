@@ -30,8 +30,6 @@
 .opon4,
 .opon6 {
   position: absolute;
-  bottom: clamp(10px, 3vw, 20px);
-  left: clamp(5px, 2vw, 25px);
   width: clamp(60px, 15vw, 100px);
   height: clamp(60px, 15vw, 100px);
   object-fit: contain;
@@ -39,8 +37,18 @@
 }
 
 .opon3 {
-  width: clamp(60px, 13vw, 80px);
-  height: clamp(60px, 13vw, 80px);
+  bottom: clamp(10px, 3vw, 5px);
+  left: clamp(5px, 2vw, 25px);
+}
+
+.opon4 {
+  bottom: clamp(10px, 3vw, 3px);
+  left: clamp(5px, 2vw, 15px);
+}
+
+.opon6 {
+  bottom: clamp(10px, 3vw, 35px);
+  left: clamp(5px, 2vw, 15px);
 }
 
 /* === レスポンシブ対応 === */

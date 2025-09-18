@@ -99,7 +99,7 @@
 
   /* === コンテナサイズ === */
   --container-max-width: 1480px;
-  --card-max-width: min(90vw, 400px);
+  --card-max-width: min(90vw, 450px);
   --drawer-width: clamp(200px, 60vw, 220px);
 
   /* === インプットサイズ === */

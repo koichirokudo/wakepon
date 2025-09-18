@@ -114,7 +114,7 @@
 
 @media (min-width: 769px) {
   .card {
-    width: min(400px, 90vw);
+    width: min(450px, 90vw);
   }
 }
 

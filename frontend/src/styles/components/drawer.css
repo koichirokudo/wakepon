@@ -58,9 +58,9 @@
 .drawer a {
   color: var(--color-text-primary);
   text-decoration: none;
-  font-size: var(--font-size-base);
+  font-size: var(--font-size-xs);
   display: block;
-  padding: var(--spacing-sm);
+  padding: var(--spacing-xs);
   border-radius: var(--border-radius-sm);
   transition: background-color var(--transition-fast);
 }
@@ -72,7 +72,6 @@
 /* === メニューリンク === */
 .menu-link {
   display: flex;
-  align-items: center;
   gap: var(--spacing-sm);
   color: var(--color-text-primary);
   text-decoration: none;
@@ -92,14 +91,14 @@
   cursor: pointer;
   display: flex;
   align-items: center;
-  gap: var(--spacing-sm);
+  gap: var(--spacing-xs);
   font-weight: bold;
-  padding: var(--spacing-sm);
+  padding: var(--spacing-xs);
   border-radius: var(--border-radius-sm);
   transition: background-color var(--transition-fast);
   width: 100%;
   text-align: left;
-  font-size: var(--font-size-base);
+  font-size: var(--font-size-sm);
 }
 
 .menu-button:hover {
@@ -109,6 +108,7 @@
 .menu-icon {
   width: clamp(20px, 5vw, 24px);
   height: clamp(20px, 5vw, 24px);
+  margin-right: 10px;
   flex-shrink: 0;
 }
 
