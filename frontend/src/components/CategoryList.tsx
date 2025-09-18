@@ -6,15 +6,22 @@ type CategoryListProps = {
 }
 
 export default function CategoryList({ categories }: CategoryListProps) {
-  return categories.length > 0 ? (
-    <ul>
-      {categories.map((cat) => (
-        <li key={cat.id}>
-          {cat.name}
-        </li>
-      ))}
-    </ul>
-  ) : (
-    <p style={{ color: 'red' }}> カテゴリを選択してください</p >
-  )
+  return (
+    <div className="category-list">
+      {categories.length > 0 ? (
+        <div className="category-grid">
+          {categories.map((cat) => (
+            <div key={cat.id} className="category-item">
+              <span className="category-name">{cat.name}</span>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="empty-state">
+          <p className="empty-message">カテゴリを選択してください</p>
+          <div className="empty-icon">📂</div>
+        </div>
+      )}
+    </div>
+  );
 }
