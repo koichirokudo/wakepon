@@ -34,7 +34,11 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
 
           {/* ログイン必須ページは ProtectedRoute で守る */}
           <Route element={<Layout></Layout>}>
-            <Route path='/privacy-policy' element={<PrivacyPolicy/>} />
+            <Route path='/privacy-policy' element={
+              <ProtectedRoute>
+                <PrivacyPolicy/>
+              </ProtectedRoute>
+            } />
             <Route path='/categories' element={
               <ProtectedRoute>
                 <Categories />

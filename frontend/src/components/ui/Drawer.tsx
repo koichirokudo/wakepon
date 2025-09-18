@@ -20,25 +20,59 @@ export default function Drawer({ isOpen, setIsOpen }: { isOpen: boolean, setIsOp
       // ドロワーが開いているときはスクロールを無効化
       document.body.style.overflow = 'hidden';
       // ドロワーが開いているときはハンバーガーーメニューを非表示
-      const header = document.querySelector('header') as HTMLElement;
       const hamburger = document.querySelector('.hamburger') as HTMLElement;
-      if (header && hamburger) {
-        header.style.display = 'none';
+      if (hamburger) {
         hamburger.style.display = 'none';
       }
     } else {
       // ドロワーが閉じているときはスクロールを有効化
       document.body.style.overflow = 'auto';
       // ドロワーが閉じているときはハンバーガーメニューを表示
-      const header = document.querySelector('header') as HTMLElement;
       const hamburger = document.querySelector('.hamburger') as HTMLElement;
-      if (header && hamburger) {
-        header.style.display = 'block';
+      if (hamburger) {
         hamburger.style.display = 'block';
       }
     }
   }, [isOpen]);
 
+  // ログアウト処理（ブラウザバック対策付き）
+  const handleLogout = async () => {
+    try {
+      // 認証情報をクリア
+      await signout();
+      
+      // ローカルストレージとセッションストレージをクリア
+      localStorage.clear();
+      sessionStorage.clear();
+      
+      // キャッシュをクリア
+      if ('caches' in window) {
+        try {
+          const cacheNames = await caches.keys();
+          await Promise.all(cacheNames.map(name => caches.delete(name)));
+        } catch (error) {
+          console.warn('Cache clearing failed:', error);
+        }
+      }
+      
+      // 履歴を操作してバックボタンを無効化
+      // 現在のエントリを置き換える
+      window.history.replaceState(null, '', '/signin');
+      
+      // サインインページに遷移（replace: trueで履歴を置き換え）
+      navigate("/signin", { replace: true });
+      
+      // 念のためページをリロード（キャッシュされたデータを完全にクリア）
+      setTimeout(() => {
+        window.location.reload();
+      }, 100);
+      
+    } catch (error) {
+      console.error('Logout failed:', error);
+      // エラーが発生してもサインインページに遷移
+      navigate("/signin", { replace: true });
+    }
+  };
 
   const menuItems = [
     { label: "ホーム", to: "/", icon: HomeIcon },
@@ -74,8 +108,7 @@ export default function Drawer({ isOpen, setIsOpen }: { isOpen: boolean, setIsOp
                   className="menu-button"
                   onClick={async () => {
                     if (item.label === "ログアウト") {
-                      await signout();
-                      navigate("/signin");
+                      await handleLogout();
                     }
                     toggleDrawer();
                   }}

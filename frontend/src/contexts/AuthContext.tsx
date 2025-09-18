@@ -29,20 +29,84 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }
 
   const signout = async () => {
-    return await supabase.auth.signOut();
+    // サインアウト前に状態をクリア
+    setUser(null);
+    setMember(null);
+    setSession(null);
+    
+    const result = await supabase.auth.signOut();
+    
+    // サインアウト後も確実に状態をクリア
+    setIsLoading(false);
+    
+    return result;
   }
 
   // セッションの読み取り onAuthStateChange で常に最新状態を保つ
   useEffect(() => {
     const initialize = async () => {
       setIsLoading(true);
-      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-      if (sessionError || !session) {
+      
+      try {
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+        
+        if (sessionError || !session) {
+          setSession(null);
+          setUser(null);
+          setMember(null);
+          setIsLoading(false);
+          return;
+        }
+
+        setSession(session);
+        
+        if (session?.user) {
+          try {
+            const [userRes, memberRes] = await Promise.all([
+              supabase.from("users").select().eq("id", session.user.id).single(),
+              supabase.from("household_members").select().eq("user_id", session.user.id).single()
+            ]);
+
+            if (userRes.data) {
+              setUser(userRes.data);
+            }
+            if (memberRes.data) {
+              setMember(memberRes.data);
+            }
+          } catch (error) {
+            console.error("Error fetching user or member:", error);
+            setUser(null);
+            setMember(null);
+          }
+        }
+      } catch (error) {
+        console.error("Error initializing auth:", error);
         setSession(null);
-        return;
+        setUser(null);
+        setMember(null);
+      } finally {
+        setIsLoading(false);
       }
-      setSession(session);
-      if (session?.user) {
+    }
+
+    // 初回取得
+    initialize();
+
+    // 認証状態が変化したときに自動で再取得
+    const { data: listener } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log('Auth state changed:', event, session);
+      
+      if (event === 'SIGNED_OUT' || !session) {
+        // サインアウト時は即座に状態をクリア
+        setSession(null);
+        setUser(null);
+        setMember(null);
+        setIsLoading(false);
+      } else if (event === 'SIGNED_IN' && session?.user) {
+        // サインイン時は初期化処理を実行
+        setIsLoading(true);
+        setSession(session);
+        
         try {
           const [userRes, memberRes] = await Promise.all([
             supabase.from("users").select().eq("id", session.user.id).single(),
@@ -59,21 +123,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           console.error("Error fetching user or member:", error);
           setUser(null);
           setMember(null);
+        } finally {
+          setIsLoading(false);
         }
-      }
-      setIsLoading(false);
-    }
-
-    // 初回取得
-    initialize();
-
-    // 認証状態が変化したときに自動で再取得
-    const { data: listener } = supabase.auth.onAuthStateChange(async (_event, session) => {
-      if (session?.user) {
-        initialize();
-      } else {
-        setUser(null);
-        setMember(null);
+      } else if (event === 'TOKEN_REFRESHED' && session) {
+        // トークン更新時はセッションのみ更新
+        setSession(session);
       }
     });
 
