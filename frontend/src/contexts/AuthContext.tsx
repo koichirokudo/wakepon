@@ -10,7 +10,7 @@ type AuthContextType = {
   member: Member | null;
   isLoading: boolean;
   signin: (email: string) => Promise<AuthOtpResponse>;
-  signout: () => Promise<{ error: AuthError | null; }>;
+  signout: () => Promise<{ error: AuthError | null }>;
   setUser: React.Dispatch<React.SetStateAction<User | null>>;
 };
 
@@ -23,117 +23,125 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   const signin = async (email: string) => {
-    return await supabase.auth.signInWithOtp({
-      email: email,
-    });
-  }
+    return await supabase.auth.signInWithOtp({ email });
+  };
 
   const signout = async () => {
-    // サインアウト前に状態をクリア
     setUser(null);
     setMember(null);
     setSession(null);
-    
     const result = await supabase.auth.signOut();
-    
-    // サインアウト後も確実に状態をクリア
     setIsLoading(false);
-    
     return result;
-  }
+  };
 
-  // セッションの読み取り onAuthStateChange で常に最新状態を保つ
+  // リロード時に getSession を呼ぶ
   useEffect(() => {
+    let isMounted = true;
+    let timeoutId: number;
+
     const initialize = async () => {
       setIsLoading(true);
-      
       try {
-        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-        
-        if (sessionError || !session) {
+        console.log('getSession before');
+
+        // タイムアウト付きでgetSessionを実行
+        const sessionPromise = supabase.auth.getSession();
+        const timeoutPromise = new Promise((_, reject) => {
+          timeoutId = window.setTimeout(() => {
+            reject(new Error('getSession timeout'));
+          }, 5000); // 5秒でタイムアウト
+        });
+
+        const { data: { session }, error } = await Promise.race([
+          sessionPromise,
+          timeoutPromise
+        ]) as any;
+
+        clearTimeout(timeoutId);
+        console.log('getSession after');
+
+        if (!isMounted) return;
+
+        if (error || !session) {
           setSession(null);
           setUser(null);
           setMember(null);
-          setIsLoading(false);
           return;
         }
 
         setSession(session);
-        
-        if (session?.user) {
-          try {
-            const [userRes, memberRes] = await Promise.all([
-              supabase.from("users").select().eq("id", session.user.id).single(),
-              supabase.from("household_members").select().eq("user_id", session.user.id).single()
-            ]);
 
-            if (userRes.data) {
-              setUser(userRes.data);
-            }
-            if (memberRes.data) {
-              setMember(memberRes.data);
-            }
-          } catch (error) {
-            console.error("Error fetching user or member:", error);
-            setUser(null);
-            setMember(null);
-          }
+        if (session.user) {
+          const [userRes, memberRes] = await Promise.all([
+            supabase.from("users").select().eq("id", session.user.id).single(),
+            supabase.from("household_members").select().eq("user_id", session.user.id).single()
+          ]);
+          if (!isMounted) return;
+
+          setUser(userRes.data || null);
+          setMember(memberRes.data || null);
         }
-      } catch (error) {
-        console.error("Error initializing auth:", error);
+      } catch (err) {
+        clearTimeout(timeoutId);
+        if (!isMounted) return;
+        console.error("Error initializing auth:", err);
         setSession(null);
         setUser(null);
         setMember(null);
       } finally {
-        setIsLoading(false);
+        if (isMounted) setIsLoading(false);
       }
-    }
+    };
 
-    // 初回取得
     initialize();
 
-    // 認証状態が変化したときに自動で再取得
+    return () => {
+      isMounted = false;
+      clearTimeout(timeoutId);
+    };
+  }, []);
+
+  // サインイン・サインアウト・トークン更新
+  useEffect(() => {
+    let isMounted = true;
+
     const { data: listener } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log('Auth state changed:', event, session);
-      
+      if (!isMounted) return;
+
       if (event === 'SIGNED_OUT' || !session) {
-        // サインアウト時は即座に状態をクリア
         setSession(null);
         setUser(null);
         setMember(null);
         setIsLoading(false);
       } else if (event === 'SIGNED_IN' && session?.user) {
-        // サインイン時は初期化処理を実行
         setIsLoading(true);
         setSession(session);
-        
+
         try {
           const [userRes, memberRes] = await Promise.all([
             supabase.from("users").select().eq("id", session.user.id).single(),
             supabase.from("household_members").select().eq("user_id", session.user.id).single()
           ]);
 
-          if (userRes.data) {
-            setUser(userRes.data);
-          }
-          if (memberRes.data) {
-            setMember(memberRes.data);
-          }
-        } catch (error) {
-          console.error("Error fetching user or member:", error);
+          if (!isMounted) return;
+
+          setUser(userRes.data || null);
+          setMember(memberRes.data || null);
+        } catch (err) {
+          console.error("Error fetching user or member:", err);
           setUser(null);
           setMember(null);
         } finally {
-          setIsLoading(false);
+          if (isMounted) setIsLoading(false);
         }
       } else if (event === 'TOKEN_REFRESHED' && session) {
-        // トークン更新時はセッションのみ更新
         setSession(session);
       }
     });
 
     return () => {
-      // クリーンアップ
+      isMounted = false;
       listener?.subscription.unsubscribe();
     };
   }, []);
@@ -147,8 +155,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
 export const useAuth = () => {
   const ctx = useContext(AuthContext);
-  if (!ctx) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
+  if (!ctx) throw new Error('useAuth must be used within an AuthProvider');
   return ctx;
-}
+};
