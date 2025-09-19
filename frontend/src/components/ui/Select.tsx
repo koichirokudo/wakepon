@@ -10,8 +10,8 @@ interface SelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
 const Select = forwardRef<HTMLSelectElement, SelectProps>(
   ({ label, error, values, className, ...props }, ref) => (
     <div>
-      {label && <label className="label-base">{label}</label>}
-      <select ref={ref} className="select-base" {...props}>
+      {label && <label htmlFor="select" className="label-base">{label}</label>}
+      <select id="select" ref={ref} className="select-base" {...props}>
         {values.map((value) => (
           <option key={String(value.id)} value={String(value.id)}>
             {value.name}
