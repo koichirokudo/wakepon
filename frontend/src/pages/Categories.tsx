@@ -39,7 +39,7 @@ export default function Categories() {
       .eq('household_id', member?.household_id);
     if (hcError) return handleError("世帯カテゴリ取得失敗", hcError);
 
-    setEnableCategoryIds(hcData.map((hc) => hc.category_id));
+    setEnableCategoryIds(hcData.map((hc: { category_id: string }) => hc.category_id));
     setIsLoading(false);
   }
 

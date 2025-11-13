@@ -70,7 +70,7 @@ export default function Expenses() {
       if (error) {
         handleError(error, "カテゴリ取得失敗");
       } else {
-        const cat = data?.flatMap((d) => d.categories);
+        const cat = data?.flatMap((d: { categories: { id: string; name: string }[] }) => d.categories);
         setCategories(cat);
       }
     };

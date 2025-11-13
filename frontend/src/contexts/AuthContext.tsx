@@ -1,7 +1,7 @@
 // src/contexts/AuthContext.tsx
 import { createContext, useContext, useState, useEffect } from 'react';
 import { supabase } from '../lib/supabaseClient';
-import type { AuthError, AuthOtpResponse, Session } from '@supabase/supabase-js';
+import type { AuthError, AuthOtpResponse, Session, AuthChangeEvent } from '@supabase/supabase-js';
 import type { Member, User } from '../types';
 import { logger } from '../utils/logger';
 
@@ -121,7 +121,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     let isMounted = true;
     let isInitialEvent = true; // 初回イベントかどうかのフラグ
 
-    const { data: listener } = supabase.auth.onAuthStateChange(async (event, session) => {
+    const { data: listener } = supabase.auth.onAuthStateChange(async (event: AuthChangeEvent, session: Session | null) => {
       logger.log('[Auth] onAuthStateChange:', { event, hasSession: !!session, isMounted, isInitialEvent });
 
       if (!isMounted) return;
