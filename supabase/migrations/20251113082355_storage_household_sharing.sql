@@ -1,9 +1,9 @@
--- Storage avatars Ğ±ÃÈ’/…q	k	ô
+-- Change avatars bucket from private to household sharing
 
--- âXnİê·ü’Jd
+-- Drop existing policy
 DROP POLICY IF EXISTS "Users can manage their own avatar" ON storage.objects;
 
--- 1. ên¢Ğ¿ü’¢Ã×íüÉûô°ûJdgM‹
+-- 1. Users can upload, update, and delete their own avatars
 CREATE POLICY "Users can upload their own avatar"
 ON storage.objects
 FOR INSERT
@@ -28,17 +28,17 @@ USING (
   (storage.foldername(name))[1] = auth.uid()::text
 );
 
--- 2. ên¢Ğ¿ü~_oX/náóĞün¢Ğ¿ü’²§gM‹
+-- 2. Users can view their own avatar and avatars from household members
 CREATE POLICY "Users can view household members avatars"
 ON storage.objects
 FOR SELECT
 USING (
   bucket_id = 'avatars' AND
   (
-    -- ênÕ¡¤ë
+    -- Own files
     (storage.foldername(name))[1] = auth.uid()::text
     OR
-    -- X/náóĞünÕ¡¤ë
+    -- Files from same household members
     EXISTS (
       SELECT 1
       FROM household_members hm1
