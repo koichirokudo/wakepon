@@ -16,18 +16,23 @@ export default function SignIn() {
     defaultValues: { email: "" }
   });
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [errorMessage, setErrorMessage] = useState<string>("");
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const inviteCode = searchParams.get('invite_code');
 
   const onSignin = async (data: SigninInput) => {
     setIsLoading(true);
+    setErrorMessage("");
     const email = data.email;
 
     try {
       const { error } = await signin(email);
 
-      if (!error) {
+      if (error) {
+        setErrorMessage(`エラー: ${error.message}`);
+        console.error('サインインエラー:', error);
+      } else {
         if (inviteCode) {
           navigate(`/verify-otp?invite_code=${inviteCode}`, { state: { email } });
         } else {
@@ -36,7 +41,8 @@ export default function SignIn() {
       }
 
     } catch (error) {
-      console.error(error);
+      console.error('予期しないエラー:', error);
+      setErrorMessage('予期しないエラーが発生しました。もう一度お試しください。');
     } finally {
       setIsLoading(false);
     }
@@ -48,6 +54,18 @@ export default function SignIn() {
         <CardHeader>ログイン</CardHeader>
         <CardBody>
           <form onSubmit={handleSubmit(onSignin)}>
+            {errorMessage && (
+              <div style={{
+                backgroundColor: '#fee',
+                border: '1px solid #fcc',
+                padding: '10px',
+                borderRadius: '4px',
+                marginBottom: '15px',
+                color: '#c00'
+              }}>
+                {errorMessage}
+              </div>
+            )}
             <Input
               label="メールアドレス"
               error={errors.email?.message}
