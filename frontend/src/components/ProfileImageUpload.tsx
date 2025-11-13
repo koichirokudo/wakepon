@@ -1,5 +1,5 @@
 // src/components/ProfileImageUpload.tsx
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { supabase } from '../lib/supabaseClient';
 import { useErrorHandler } from '../utils/errorHandler';
 import IconButton from './ui/IconButton';
@@ -21,6 +21,11 @@ export default function ProfileImageUpload({
   const [uploadedImageUrl, setUploadedImageUrl] = useState(currentAvatarUrl || '');
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const { handleError, showSuccess } = useErrorHandler();
+
+  // currentAvatarUrlが変更されたら、uploadedImageUrlも更新
+  useEffect(() => {
+    setUploadedImageUrl(currentAvatarUrl || '');
+  }, [currentAvatarUrl]);
 
   const handleAvatarClick = () => {
     fileInputRef.current?.click();
@@ -82,11 +87,18 @@ export default function ProfileImageUpload({
     }
   };
 
+  // キャッシュバスティング用のURLを生成
+  const getImageUrlWithCacheBuster = (url: string) => {
+    if (!url) return defaultAvatar;
+    const cacheBuster = `?t=${Date.now()}`;
+    return url + cacheBuster;
+  };
+
   return (
     <div className="profile-image-upload">
       <div className="profile-avatar-container">
         <img
-          src={uploadedImageUrl || defaultAvatar}
+          src={uploadedImageUrl ? getImageUrlWithCacheBuster(uploadedImageUrl) : defaultAvatar}
           alt="プロフィール画像"
           className="profile-avatar-image"
         />
