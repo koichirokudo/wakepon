@@ -53,13 +53,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     try {
       logger.log('[Auth] データベースクエリ開始');
 
-      // 10秒のタイムアウトを設定
+      // 3秒のタイムアウトを設定（タブ切り替えでは通常スキップされるので、これは念のため）
       const [userRes, memberRes] = await withTimeout(
         Promise.all([
           supabase.from("users").select().eq("id", userId).single(),
           supabase.from("household_members").select().eq("user_id", userId).single()
         ]),
-        10000
+        3000
       );
 
       logger.log('[Auth] データベースクエリ完了:', {
@@ -170,7 +170,25 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setMember(null);
         setIsLoading(false);
       } else if (event === 'SIGNED_IN' && session?.user) {
-        logger.log('[Auth] SIGNED_IN イベント、データ取得開始');
+        logger.log('[Auth] SIGNED_IN イベント検出');
+
+        // タブが非アクティブの場合はスキップ（タブ切り替え対策）
+        if (document.hidden) {
+          logger.log('[Auth] タブが非アクティブのためデータ取得をスキップ');
+          setSession(session);
+          setIsLoading(false);
+          return;
+        }
+
+        // 既にユーザーデータがある場合はスキップ（不要な再取得を防止）
+        if (user && member) {
+          logger.log('[Auth] ユーザーデータが既に存在するためスキップ');
+          setSession(session);
+          setIsLoading(false);
+          return;
+        }
+
+        logger.log('[Auth] データ取得開始');
         isProcessingSIGNED_IN = true; // 処理開始フラグをON
         setIsLoading(true);
         setSession(session);
