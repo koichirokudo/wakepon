@@ -211,6 +211,28 @@
   }
 }
 
+/* === 追加ボタン === */
+.expense-add-button {
+  margin-top: var(--spacing-2xl);
+  padding: var(--button-padding-lg);
+  border-radius: var(--border-radius-xl);
+  font-size: var(--font-size-lg);
+  width: 100%;
+  border: none;
+}
+
+/* === 編集ボタン === */
+.expense-edit-buttons {
+  display: flex;
+  gap: var(--spacing-lg);
+  margin-top: var(--spacing-md);
+}
+
+.expense-edit-buttons .button {
+  border-radius: var(--border-radius-xl);
+  flex: 1;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .expense-item {
     transition: none;

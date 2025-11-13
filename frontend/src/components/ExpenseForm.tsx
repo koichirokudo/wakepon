@@ -88,14 +88,13 @@ export default function ExpenseForm({ expenseToEdit, categories, editing = false
         {...register("memo", validationRules.memo)}
       />
       {editing ? (
-        <>
-          <button type="submit" className="button button-sm button-secondary">保存</button>
-          <button type="button" className="button button-sm button-danger" onClick={handleCancel}>キャンセル</button>
-        </>
+        <div className="expense-edit-buttons">
+          <button type="submit" className="button button-md button-secondary">保存</button>
+          <button type="button" className="button button-md button-danger" onClick={handleCancel}>キャンセル</button>
+        </div>
       ) : (
-        <button type="submit" className="button button-primary">追加</button>
+        <button type="submit" className="button button-primary expense-add-button">追加</button>
       )}
-      <br />
     </form>
   );
 }

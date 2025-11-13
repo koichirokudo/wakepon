@@ -3,6 +3,7 @@ import { createContext, useContext, useState, useEffect } from 'react';
 import { supabase } from '../lib/supabaseClient';
 import type { AuthError, AuthOtpResponse, Session } from '@supabase/supabase-js';
 import type { Member, User } from '../types';
+import { logger } from '../utils/logger';
 
 type AuthContextType = {
   session: Session | null;
@@ -35,35 +36,44 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     return result;
   };
 
+  // ユーザーとメンバーデータを取得する共通関数
+  const fetchUserAndMember = async (userId: string) => {
+    logger.log('[Auth] ユーザーID:', userId);
+    const [userRes, memberRes] = await Promise.all([
+      supabase.from("users").select().eq("id", userId).single(),
+      supabase.from("household_members").select().eq("user_id", userId).single()
+    ]);
+
+    logger.log('[Auth] データベースクエリ完了:', {
+      hasUser: !!userRes.data,
+      hasMember: !!memberRes.data,
+      userError: userRes.error,
+      memberError: memberRes.error
+    });
+
+    return { user: userRes.data || null, member: memberRes.data || null };
+  };
+
   // リロード時に getSession を呼ぶ
   useEffect(() => {
     let isMounted = true;
-    let timeoutId: number;
 
     const initialize = async () => {
       setIsLoading(true);
       try {
-        console.log('getSession before');
+        logger.log('[Auth] 初期化開始');
 
-        // タイムアウト付きでgetSessionを実行
-        const sessionPromise = supabase.auth.getSession();
-        const timeoutPromise = new Promise((_, reject) => {
-          timeoutId = window.setTimeout(() => {
-            reject(new Error('getSession timeout'));
-          }, 5000); // 5秒でタイムアウト
-        });
+        const { data: { session }, error } = await supabase.auth.getSession();
 
-        const { data: { session }, error } = await Promise.race([
-          sessionPromise,
-          timeoutPromise
-        ]) as any;
+        logger.log('[Auth] getSession完了:', { hasSession: !!session, error });
 
-        clearTimeout(timeoutId);
-        console.log('getSession after');
-
-        if (!isMounted) return;
+        if (!isMounted) {
+          logger.log('[Auth] コンポーネントがアンマウントされました');
+          return;
+        }
 
         if (error || !session) {
+          logger.log('[Auth] セッションなし、状態をクリア');
           setSession(null);
           setUser(null);
           setMember(null);
@@ -71,26 +81,31 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         }
 
         setSession(session);
+        logger.log('[Auth] セッション設定完了、ユーザーデータ取得開始');
 
         if (session.user) {
-          const [userRes, memberRes] = await Promise.all([
-            supabase.from("users").select().eq("id", session.user.id).single(),
-            supabase.from("household_members").select().eq("user_id", session.user.id).single()
-          ]);
-          if (!isMounted) return;
+          const { user: userData, member: memberData } = await fetchUserAndMember(session.user.id);
 
-          setUser(userRes.data || null);
-          setMember(memberRes.data || null);
+          if (!isMounted) {
+            logger.log('[Auth] コンポーネントがアンマウントされました（クエリ後）');
+            return;
+          }
+
+          setUser(userData);
+          setMember(memberData);
+          logger.log('[Auth] ユーザーとメンバー情報設定完了');
         }
       } catch (err) {
-        clearTimeout(timeoutId);
         if (!isMounted) return;
-        console.error("Error initializing auth:", err);
+        logger.error("[Auth] エラー:", err);
         setSession(null);
         setUser(null);
         setMember(null);
       } finally {
-        if (isMounted) setIsLoading(false);
+        if (isMounted) {
+          logger.log('[Auth] 初期化完了、ローディング終了');
+          setIsLoading(false);
+        }
       }
     };
 
@@ -98,44 +113,57 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     return () => {
       isMounted = false;
-      clearTimeout(timeoutId);
     };
   }, []);
 
   // サインイン・サインアウト・トークン更新
   useEffect(() => {
     let isMounted = true;
+    let isInitialEvent = true; // 初回イベントかどうかのフラグ
 
     const { data: listener } = supabase.auth.onAuthStateChange(async (event, session) => {
+      logger.log('[Auth] onAuthStateChange:', { event, hasSession: !!session, isMounted, isInitialEvent });
+
       if (!isMounted) return;
 
+      // 初回のSIGNED_INイベントは無視（初期化useEffectで処理済み）
+      if (isInitialEvent && event === 'SIGNED_IN') {
+        logger.log('[Auth] 初回SIGNED_INイベントをスキップ');
+        isInitialEvent = false;
+        return;
+      }
+      isInitialEvent = false;
+
       if (event === 'SIGNED_OUT' || !session) {
+        logger.log('[Auth] SIGNED_OUT または セッションなし');
         setSession(null);
         setUser(null);
         setMember(null);
         setIsLoading(false);
       } else if (event === 'SIGNED_IN' && session?.user) {
+        logger.log('[Auth] SIGNED_IN イベント、データ取得開始');
         setIsLoading(true);
         setSession(session);
 
         try {
-          const [userRes, memberRes] = await Promise.all([
-            supabase.from("users").select().eq("id", session.user.id).single(),
-            supabase.from("household_members").select().eq("user_id", session.user.id).single()
-          ]);
+          const { user: userData, member: memberData } = await fetchUserAndMember(session.user.id);
 
           if (!isMounted) return;
 
-          setUser(userRes.data || null);
-          setMember(memberRes.data || null);
+          setUser(userData);
+          setMember(memberData);
         } catch (err) {
-          console.error("Error fetching user or member:", err);
+          logger.error("[Auth] SIGNED_IN データ取得エラー:", err);
           setUser(null);
           setMember(null);
         } finally {
-          if (isMounted) setIsLoading(false);
+          if (isMounted) {
+            logger.log('[Auth] SIGNED_IN 処理完了、ローディング終了');
+            setIsLoading(false);
+          }
         }
       } else if (event === 'TOKEN_REFRESHED' && session) {
+        logger.log('[Auth] TOKEN_REFRESHED イベント');
         setSession(session);
       }
     });

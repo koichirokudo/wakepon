@@ -10,6 +10,8 @@ import Invite from './pages/Invite.tsx'
 import Profile from './pages/Profile.tsx'
 import VerifyOtp from './pages/VerifyOtp.tsx'
 import { AuthProvider } from './contexts/AuthContext.tsx'
+import { ToastProvider } from './contexts/ToastContext.tsx'
+import ToastContainer from './components/ui/Toast.tsx'
 import Layout from './Layout.tsx'
 import ProtectedRoute from './components/ProtectedRoute.tsx'
 import PrivacyPolicy from './pages/PrivacyPolicy.tsx'
@@ -23,42 +25,45 @@ import 'normalize.css';
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <BrowserRouter>
-      <AuthProvider>
-        <Routes>
-          {/* 誰でも見れる */}
-          <Route path='/signin' element={<SignIn />} />
-          <Route path='/verify-otp' element={<VerifyOtp />} />
+      <ToastProvider>
+        <AuthProvider>
+          <ToastContainer />
+          <Routes>
+            {/* 誰でも見れる */}
+            <Route path='/signin' element={<SignIn />} />
+            <Route path='/verify-otp' element={<VerifyOtp />} />
 
-          {/* ログイン必須ページは ProtectedRoute で守る */}
-          <Route element={<Layout></Layout>}>
-            <Route path='/privacy-policy' element={
-              <ProtectedRoute>
-                <PrivacyPolicy/>
-              </ProtectedRoute>
-            } />
-            <Route path='/categories' element={
-              <ProtectedRoute>
-                <Categories />
-              </ProtectedRoute>
-            } />
-            <Route path='/invite' element={
-              <ProtectedRoute>
-                <Invite />
-              </ProtectedRoute>
-            } />
-            <Route path='/profile' element={
-              <ProtectedRoute>
-                <Profile />
-              </ProtectedRoute>
-            } />
-            <Route path='/' element={
-              <ProtectedRoute>
-                <Expenses />
-              </ProtectedRoute>
-            } />
-          </Route>
-        </Routes>
-      </AuthProvider>
+            {/* ログイン必須ページは ProtectedRoute で守る */}
+            <Route element={<Layout></Layout>}>
+              <Route path='/privacy-policy' element={
+                <ProtectedRoute>
+                  <PrivacyPolicy/>
+                </ProtectedRoute>
+              } />
+              <Route path='/categories' element={
+                <ProtectedRoute>
+                  <Categories />
+                </ProtectedRoute>
+              } />
+              <Route path='/invite' element={
+                <ProtectedRoute>
+                  <Invite />
+                </ProtectedRoute>
+              } />
+              <Route path='/profile' element={
+                <ProtectedRoute>
+                  <Profile />
+                </ProtectedRoute>
+              } />
+              <Route path='/' element={
+                <ProtectedRoute>
+                  <Expenses />
+                </ProtectedRoute>
+              } />
+            </Route>
+          </Routes>
+        </AuthProvider>
+      </ToastProvider>
     </BrowserRouter>
   </React.StrictMode>
 )

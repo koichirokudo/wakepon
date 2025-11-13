@@ -37,6 +37,24 @@ export type Settlement = {
   amount: number;
 };
 
+// Supabaseクエリ結果の型定義
+export type ExpenseQueryResult = {
+  id: string;
+  date: string;
+  amount: number;
+  memo: string;
+  users: { name: string } | null;
+  categories: { id: string; name: string } | { id: string; name: string }[] | null;
+};
+
+export type ExpenseInsertResult = {
+  id: string;
+  date: string;
+  amount: number;
+  memo: string;
+  categories: { id: string; name: string } | { id: string; name: string }[] | null;
+};
+
 export type Category = {
   id: string;
   name: string;

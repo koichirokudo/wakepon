@@ -1,0 +1,135 @@
+/* === Toast通知コンポーネント === */
+
+.toast-container {
+  position: fixed;
+  top: var(--spacing-lg);
+  right: var(--spacing-lg);
+  z-index: var(--z-index-modal);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  max-width: 400px;
+  pointer-events: none;
+}
+
+.toast {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing-md);
+  border-radius: var(--border-radius-lg);
+  background-color: var(--color-bg-primary);
+  box-shadow: var(--shadow-lg);
+  animation: slideIn 0.3s ease-out;
+  pointer-events: auto;
+  cursor: pointer;
+  min-width: 300px;
+}
+
+.toast-content {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  flex: 1;
+}
+
+.toast-icon {
+  font-size: var(--font-size-xl);
+  font-weight: bold;
+  flex-shrink: 0;
+}
+
+.toast-message {
+  font-size: var(--font-size-base);
+  color: var(--color-text-primary);
+}
+
+.toast-close {
+  background: none;
+  border: none;
+  font-size: var(--font-size-xl);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  padding: 0;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: background-color var(--transition-fast);
+}
+
+.toast-close:hover {
+  background-color: var(--color-bg-muted);
+}
+
+/* === Toast タイプ別スタイル === */
+.toast-success {
+  border-left: 4px solid var(--color-success);
+  background-color: var(--color-success-bg);
+}
+
+.toast-success .toast-icon {
+  color: var(--color-success);
+}
+
+.toast-error {
+  border-left: 4px solid var(--color-error);
+  background-color: var(--color-error-bg);
+}
+
+.toast-error .toast-icon {
+  color: var(--color-error);
+}
+
+.toast-warning {
+  border-left: 4px solid #f59e0b;
+  background-color: #fffbeb;
+}
+
+.toast-warning .toast-icon {
+  color: #f59e0b;
+}
+
+.toast-info {
+  border-left: 4px solid var(--color-info);
+  background-color: var(--color-info-bg);
+}
+
+.toast-info .toast-icon {
+  color: var(--color-info);
+}
+
+/* === アニメーション === */
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* === レスポンシブ対応 === */
+@media (max-width: 480px) {
+  .toast-container {
+    top: var(--spacing-sm);
+    right: var(--spacing-sm);
+    left: var(--spacing-sm);
+    max-width: none;
+  }
+
+  .toast {
+    min-width: auto;
+  }
+}
+
+/* === アクセシビリティ対応 === */
+@media (prefers-reduced-motion: reduce) {
+  .toast {
+    animation: none;
+  }
+}

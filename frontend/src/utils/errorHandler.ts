@@ -1,5 +1,5 @@
 // src/utils/errorHandler.ts
-import { useState } from "react";
+import { useToast } from '../contexts/ToastContext';
 
 export type AppError = {
   code: string;
@@ -9,8 +9,11 @@ export type AppError = {
 
 export class ErrorHandler {
   static handleSupabaseError(error: any): AppError {
-    console.error('Supabase error:', error);
-    
+    // 本番環境以外でのみコンソールログを出力
+    if (import.meta.env.MODE !== 'production') {
+      console.error('Supabase error:', error);
+    }
+
     // Supabase エラーコードに基づく分類
     switch (error?.code) {
       case 'PGRST116':
@@ -48,7 +51,9 @@ export class ErrorHandler {
   }
 
   static handleNetworkError(error: any): AppError {
-    console.error('Network error:', error);
+    if (import.meta.env.MODE !== 'production') {
+      console.error('Network error:', error);
+    }
     return {
       code: 'NETWORK_ERROR',
       message: 'ネットワークエラーが発生しました。接続を確認してください。',
@@ -57,27 +62,42 @@ export class ErrorHandler {
   }
 }
 
-// カスタムフック
+/**
+ * エラーハンドリングとToast通知を統合したカスタムフック
+ */
 export const useErrorHandler = () => {
-  const [error, setError] = useState<AppError | null>(null);
+  const { showToast } = useToast();
 
   const handleError = (error: any, context?: string) => {
     let appError: AppError;
-    
+
     if (error?.message?.includes('fetch')) {
       appError = ErrorHandler.handleNetworkError(error);
     } else {
       appError = ErrorHandler.handleSupabaseError(error);
     }
-    
+
     if (context) {
       appError.message = `${context}: ${appError.message}`;
     }
-    
-    setError(appError);
+
+    // Toast通知でエラーを表示
+    showToast('error', appError.message);
+
+    return appError;
   };
 
-  const clearError = () => setError(null);
+  const showSuccess = (message: string) => {
+    showToast('success', message);
+  };
 
-  return { error, handleError, clearError };
+  const showInfo = (message: string) => {
+    showToast('info', message);
+  };
+
+  const showWarning = (message: string) => {
+    showToast('warning', message);
+  };
+
+  return { handleError, showSuccess, showInfo, showWarning };
 };

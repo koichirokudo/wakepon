@@ -65,6 +65,69 @@
   transform: scale(1.1);
 }
 
+/* === プロフィール画像アップロード === */
+.profile-image-upload {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-lg);
+}
+
+.profile-avatar-container {
+  position: relative;
+  width: fit-content;
+}
+
+.profile-avatar-image {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #F76E6E;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.profile-camera-button {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+}
+
+.profile-upload-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--border-radius-full);
+  background-color: var(--color-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-fast);
+  box-shadow: var(--shadow-sm);
+  border: none;
+}
+
+.profile-upload-btn:hover:not(:disabled) {
+  background-color: var(--color-primary-hover);
+  box-shadow: var(--shadow-md);
+  transform: scale(1.1);
+}
+
+.profile-upload-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.profile-upload-btn img {
+  filter: brightness(0) invert(1);
+}
+
+.profile-upload-status {
+  color: #666;
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+}
+
 /* === 編集関連 === */
 .edit-toggle-btn {
   position: absolute;
@@ -84,11 +147,104 @@
   background-color: var(--color-bg-muted);
 }
 
+/* === プロフィール編集フィールド === */
+.profile-editable-field {
+  width: 100%;
+}
+
+.profile-field-container {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-md);
+  width: 100%;
+}
+
+.profile-input-wrapper {
+  flex: 1;
+  min-width: 0;
+}
+
+.profile-actions {
+  display: flex;
+  gap: var(--spacing-sm);
+  align-items: center;
+  margin-top: calc(1.2em + var(--spacing-sm));
+  flex-shrink: 0;
+}
+
+/* === プロフィール編集ボタンスタイル === */
+.profile-edit-btn,
+.profile-save-btn,
+.profile-cancel-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--border-radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-fast);
+  border: none;
+}
+
+.profile-edit-btn {
+  background-color: var(--color-primary);
+}
+
+.profile-edit-btn:hover:not(:disabled) {
+  background-color: var(--color-primary-hover);
+  transform: translateY(-1px);
+}
+
+.profile-save-btn {
+  background-color: var(--color-secondary);
+}
+
+.profile-save-btn:hover:not(:disabled) {
+  background-color: var(--color-secondary-hover);
+  transform: translateY(-1px);
+}
+
+.profile-cancel-btn {
+  background-color: var(--color-danger);
+}
+
+.profile-cancel-btn:hover:not(:disabled) {
+  background-color: var(--color-danger-hover);
+  transform: translateY(-1px);
+}
+
+.profile-edit-btn:disabled,
+.profile-save-btn:disabled,
+.profile-cancel-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.profile-edit-btn img {
+  filter: brightness(0) invert(1);
+}
+
+.profile-cancel-btn img {
+  filter: brightness(0) invert(1);
+}
+
 /* === レスポンシブ対応 === */
 @media (max-width: 480px) {
   .profile {
     padding: var(--spacing-md);
     background-attachment: scroll;
+  }
+
+  .profile-field-container {
+    flex-direction: column;
+    gap: var(--spacing-sm);
+  }
+
+  .profile-actions {
+    padding-top: var(--spacing-sm);
+    width: 100%;
+    justify-content: flex-end;
   }
 }
 

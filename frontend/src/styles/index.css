@@ -15,6 +15,7 @@
 @import './components/input.css';
 @import './components/drawer.css';
 @import './components/message.css';
+@import './components/toast.css';
 
 /* ページ */
 @import './pages/signin.css';
