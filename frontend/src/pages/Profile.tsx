@@ -45,8 +45,8 @@ export default function Profile() {
   };
 
   // 画像アップロード成功時の処理
-  const handleImageUploadSuccess = (newAvatarUrl: string) => {
-    setUser((prev) => (prev ? { ...prev, avatar_url: newAvatarUrl } : null));
+  const handleImageUploadSuccess = (newAvatarFilename: string) => {
+    setUser((prev) => (prev ? { ...prev, avatar_filename: newAvatarFilename } : null));
   };
 
   return (
@@ -59,7 +59,7 @@ export default function Profile() {
             <div style={{ marginBottom: '2rem' }}>
               <ProfileImageUpload
                 userId={user.id}
-                currentAvatarUrl={user.avatar_url}
+                currentAvatarFilename={user.avatar_filename}
                 onUploadSuccess={handleImageUploadSuccess}
               />
             </div>

@@ -8,24 +8,48 @@ import defaultAvatar from '../assets/default-avatar.png';
 
 type ProfileImageUploadProps = {
   userId: string;
-  currentAvatarUrl: string | null;
-  onUploadSuccess: (newAvatarUrl: string) => void;
+  currentAvatarFilename: string | null;
+  onUploadSuccess: (newAvatarFilename: string) => void;
 };
 
 export default function ProfileImageUpload({
   userId,
-  currentAvatarUrl,
+  currentAvatarFilename,
   onUploadSuccess,
 }: ProfileImageUploadProps) {
   const [isLoading, setIsLoading] = useState(false);
-  const [uploadedImageUrl, setUploadedImageUrl] = useState(currentAvatarUrl || '');
+  const [uploadedImageUrl, setUploadedImageUrl] = useState('');
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const { handleError, showSuccess } = useErrorHandler();
 
-  // currentAvatarUrlが変更されたら、uploadedImageUrlも更新
+  // avatar_filenameから署名付きURLを生成
   useEffect(() => {
-    setUploadedImageUrl(currentAvatarUrl || '');
-  }, [currentAvatarUrl]);
+    const loadAvatarUrl = async () => {
+      if (!currentAvatarFilename) {
+        setUploadedImageUrl('');
+        return;
+      }
+
+      try {
+        const { data, error } = await supabase.storage
+          .from('avatars')
+          .createSignedUrl(currentAvatarFilename, 3600);
+
+        if (error) {
+          console.error('署名付きURL生成エラー:', error);
+          setUploadedImageUrl('');
+          return;
+        }
+
+        setUploadedImageUrl(data.signedUrl);
+      } catch (err) {
+        console.error('画像URL読み込みエラー:', err);
+        setUploadedImageUrl('');
+      }
+    };
+
+    loadAvatarUrl();
+  }, [currentAvatarFilename]);
 
   const handleAvatarClick = () => {
     fileInputRef.current?.click();
@@ -56,19 +80,23 @@ export default function ProfileImageUpload({
         return;
       }
 
-      // 公開URLを取得
-      const { data: urlData } = supabase.storage
+      // 署名付きURLを取得（世帯内共有のため、1時間有効）
+      const { data: urlData, error: urlError } = await supabase.storage
         .from('avatars')
-        .getPublicUrl(uploadData.path);
+        .createSignedUrl(uploadData.path, 3600);
 
-      const publicUrl = urlData.publicUrl;
+      if (urlError) {
+        handleError(urlError, '画像URL生成失敗');
+        return;
+      }
 
-      // ユーザー情報を更新
+      const signedUrl = urlData.signedUrl;
+
+      // ユーザー情報を更新（avatar_filenameのみ保存、URLは毎回生成）
       const { error: updateError } = await supabase
         .from('users')
         .update({
           avatar_filename: fileName,
-          avatar_url: publicUrl,
         })
         .eq('id', userId);
 
@@ -77,8 +105,8 @@ export default function ProfileImageUpload({
         return;
       }
 
-      setUploadedImageUrl(publicUrl);
-      onUploadSuccess(publicUrl);
+      setUploadedImageUrl(signedUrl);
+      onUploadSuccess(fileName);
       showSuccess('プロフィール画像を更新しました');
     } catch (error) {
       handleError(error, '画像アップロードエラー');
