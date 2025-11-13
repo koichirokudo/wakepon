@@ -1,7 +1,7 @@
 // src/hooks/useExpenseManager.ts
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '../lib/supabaseClient';
-import type { Expense, ExpenseInput, ExpenseQueryResult, ExpenseInsertResult } from '../types';
+import type { Expense, ExpenseInput, ExpenseInsertResult } from '../types';
 import { useErrorHandler } from '../utils/errorHandler';
 
 type UseExpenseManagerProps = {
@@ -66,15 +66,17 @@ export function useExpenseManager({
       if (error) {
         handleError(error, '費用の取得に失敗しました');
       } else {
-        const mapped: Expense[] = (data || []).map((item: ExpenseQueryResult) => ({
+        const mapped: Expense[] = (data || []).map((item: any) => ({
           id: item.id,
           date: item.date,
           amount: item.amount,
           memo: item.memo,
-          users: item.users,
-          category: Array.isArray(item.categories)
+          users: Array.isArray(item.users) && item.users.length > 0
+            ? item.users[0]
+            : null,
+          category: Array.isArray(item.categories) && item.categories.length > 0
             ? item.categories[0]
-            : item.categories || { id: '', name: '不明' },
+            : { id: '', name: '不明' },
         }));
 
         setExpensesCache((prev) => ({ ...prev, [selectedMonth]: mapped }));

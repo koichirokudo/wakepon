@@ -28,7 +28,7 @@ function ToastItem({ toast, onClose }: { toast: ToastType; onClose: () => void }
   );
 }
 
-function getIcon(type: ToastType): string {
+function getIcon(type: 'success' | 'error' | 'info' | 'warning'): string {
   switch (type) {
     case 'success':
       return '✓';

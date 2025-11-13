@@ -100,6 +100,21 @@ export const validationRules = {
     }
   },
 
+  name: {
+    minLength: {
+      value: 1,
+      message: "名前は1文字以上入力してください"
+    },
+    maxLength: {
+      value: 20,
+      message: "名前は20文字以内で入力してください"
+    },
+    pattern: {
+      value: /^[a-zA-Z0-9あ-んア-ヶー\s]*$/,
+      message: "名前に使用できない文字が含まれています"
+    }
+  },
+
   image: {
     validate: {
       fileSize: (files: FileList) => {

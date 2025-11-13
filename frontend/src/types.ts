@@ -43,8 +43,8 @@ export type ExpenseQueryResult = {
   date: string;
   amount: number;
   memo: string;
-  users: { name: string } | null;
-  categories: { id: string; name: string } | { id: string; name: string }[] | null;
+  users: { name: string }[] | null;
+  categories: { id: string; name: string }[] | null;
 };
 
 export type ExpenseInsertResult = {
