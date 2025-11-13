@@ -1,39 +1,27 @@
 // src/utils/logger.ts
 
-const isDevelopment = import.meta.env.MODE === 'development';
-
 /**
  * 環境別ロガー
- * 開発環境でのみログを出力し、本番環境では何もしない
+ * デバッグのため一時的に本番環境でも有効化
  */
 export const logger = {
   log: (...args: any[]) => {
-    if (isDevelopment) {
-      console.log(...args);
-    }
+    console.log(...args);
   },
 
   error: (...args: any[]) => {
-    if (isDevelopment) {
-      console.error(...args);
-    }
+    console.error(...args);
   },
 
   warn: (...args: any[]) => {
-    if (isDevelopment) {
-      console.warn(...args);
-    }
+    console.warn(...args);
   },
 
   info: (...args: any[]) => {
-    if (isDevelopment) {
-      console.info(...args);
-    }
+    console.info(...args);
   },
 
   debug: (...args: any[]) => {
-    if (isDevelopment) {
-      console.debug(...args);
-    }
+    console.debug(...args);
   },
 };
