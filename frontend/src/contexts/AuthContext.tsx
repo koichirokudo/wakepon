@@ -39,19 +39,26 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   // ユーザーとメンバーデータを取得する共通関数
   const fetchUserAndMember = async (userId: string) => {
     logger.log('[Auth] ユーザーID:', userId);
-    const [userRes, memberRes] = await Promise.all([
-      supabase.from("users").select().eq("id", userId).single(),
-      supabase.from("household_members").select().eq("user_id", userId).single()
-    ]);
 
-    logger.log('[Auth] データベースクエリ完了:', {
-      hasUser: !!userRes.data,
-      hasMember: !!memberRes.data,
-      userError: userRes.error,
-      memberError: memberRes.error
-    });
+    try {
+      logger.log('[Auth] データベースクエリ開始');
+      const [userRes, memberRes] = await Promise.all([
+        supabase.from("users").select().eq("id", userId).single(),
+        supabase.from("household_members").select().eq("user_id", userId).single()
+      ]);
 
-    return { user: userRes.data || null, member: memberRes.data || null };
+      logger.log('[Auth] データベースクエリ完了:', {
+        hasUser: !!userRes.data,
+        hasMember: !!memberRes.data,
+        userError: userRes.error,
+        memberError: memberRes.error
+      });
+
+      return { user: userRes.data || null, member: memberRes.data || null };
+    } catch (error) {
+      logger.error('[Auth] fetchUserAndMember エラー:', error);
+      return { user: null, member: null };
+    }
   };
 
   // リロード時に getSession を呼ぶ
@@ -153,15 +160,20 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setSession(session);
 
         try {
+          logger.log('[Auth] fetchUserAndMember 呼び出し前');
           const { user: userData, member: memberData } = await fetchUserAndMember(session.user.id);
+          logger.log('[Auth] fetchUserAndMember 呼び出し後:', { hasUser: !!userData, hasMember: !!memberData });
 
           if (!isMounted) {
+            logger.log('[Auth] コンポーネントアンマウント検出、処理中断');
             isProcessingSIGNED_IN = false;
             return;
           }
 
+          logger.log('[Auth] ユーザー状態更新開始');
           setUser(userData);
           setMember(memberData);
+          logger.log('[Auth] ユーザー状態更新完了');
         } catch (err) {
           logger.error("[Auth] SIGNED_IN データ取得エラー:", err);
           setUser(null);
