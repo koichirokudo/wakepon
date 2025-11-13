@@ -172,26 +172,31 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       } else if (event === 'SIGNED_IN' && session?.user) {
         logger.log('[Auth] SIGNED_IN イベント検出');
 
-        // タブが非アクティブの場合はスキップ（タブ切り替え対策）
-        if (document.hidden) {
-          logger.log('[Auth] タブが非アクティブのためデータ取得をスキップ');
-          setSession(session);
-          setIsLoading(false);
-          return;
-        }
+        setSession(session);
 
-        // 既にユーザーデータがある場合はスキップ（不要な再取得を防止）
+        // 既にユーザーデータがある場合は、バックグラウンドで更新（ローディング表示なし）
         if (user && member) {
-          logger.log('[Auth] ユーザーデータが既に存在するためスキップ');
-          setSession(session);
-          setIsLoading(false);
+          logger.log('[Auth] 既存データあり、ローディングなしでバックグラウンド更新');
+          setIsLoading(false); // 即座にローディング終了
+
+          // バックグラウンドで更新を試みる（非同期、awaitしない）
+          fetchUserAndMember(session.user.id).then(({ user: userData, member: memberData }) => {
+            if (isMounted && userData && memberData) {
+              logger.log('[Auth] バックグラウンド更新成功');
+              setUser(userData);
+              setMember(memberData);
+            }
+          }).catch(err => {
+            logger.warn('[Auth] バックグラウンド更新失敗、既存データを維持:', err);
+            // 既存データを維持（何もしない）
+          });
           return;
         }
 
-        logger.log('[Auth] データ取得開始');
+        // 初回またはデータがない場合のみローディング表示
+        logger.log('[Auth] 初回データ取得開始');
         isProcessingSIGNED_IN = true; // 処理開始フラグをON
         setIsLoading(true);
-        setSession(session);
 
         try {
           logger.log('[Auth] fetchUserAndMember 呼び出し前');
@@ -209,7 +214,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           setMember(memberData);
           logger.log('[Auth] ユーザー状態更新完了');
         } catch (err) {
-          logger.error("[Auth] SIGNED_IN データ取得エラー:", err);
+          logger.error("[Auth] 初回データ取得エラー:", err);
           setUser(null);
           setMember(null);
         } finally {
