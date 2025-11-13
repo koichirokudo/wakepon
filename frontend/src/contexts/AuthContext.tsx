@@ -36,16 +36,31 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     return result;
   };
 
+  // タイムアウト付きPromiseヘルパー
+  const withTimeout = <T,>(promise: Promise<T>, timeoutMs: number): Promise<T> => {
+    return Promise.race([
+      promise,
+      new Promise<T>((_, reject) =>
+        setTimeout(() => reject(new Error(`タイムアウト: ${timeoutMs}ms経過`)), timeoutMs)
+      ),
+    ]);
+  };
+
   // ユーザーとメンバーデータを取得する共通関数
   const fetchUserAndMember = async (userId: string) => {
     logger.log('[Auth] ユーザーID:', userId);
 
     try {
       logger.log('[Auth] データベースクエリ開始');
-      const [userRes, memberRes] = await Promise.all([
-        supabase.from("users").select().eq("id", userId).single(),
-        supabase.from("household_members").select().eq("user_id", userId).single()
-      ]);
+
+      // 10秒のタイムアウトを設定
+      const [userRes, memberRes] = await withTimeout(
+        Promise.all([
+          supabase.from("users").select().eq("id", userId).single(),
+          supabase.from("household_members").select().eq("user_id", userId).single()
+        ]),
+        10000
+      );
 
       logger.log('[Auth] データベースクエリ完了:', {
         hasUser: !!userRes.data,
@@ -57,6 +72,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       return { user: userRes.data || null, member: memberRes.data || null };
     } catch (error) {
       logger.error('[Auth] fetchUserAndMember エラー:', error);
+      // タイムアウトやエラーの場合でもnullを返して続行
       return { user: null, member: null };
     }
   };
