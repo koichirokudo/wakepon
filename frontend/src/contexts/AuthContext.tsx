@@ -126,13 +126,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
       if (!isMounted) return;
 
-      // 初回のSIGNED_INイベントは無視（初期化useEffectで処理済み）
-      if (isInitialEvent && event === 'SIGNED_IN') {
-        logger.log('[Auth] 初回SIGNED_INイベントをスキップ');
+      // 初回のINITIAL_SESSIONイベントは無視（初期化useEffectで処理済み）
+      if (isInitialEvent) {
+        logger.log('[Auth] 初回イベントをスキップ:', event);
         isInitialEvent = false;
         return;
       }
-      isInitialEvent = false;
 
       if (event === 'SIGNED_OUT' || !session) {
         logger.log('[Auth] SIGNED_OUT または セッションなし');
@@ -165,6 +164,16 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       } else if (event === 'TOKEN_REFRESHED' && session) {
         logger.log('[Auth] TOKEN_REFRESHED イベント');
         setSession(session);
+        // TOKEN_REFRESHEDの場合、ユーザーデータは変わらないのでisLoadingは触らない
+      } else {
+        // その他のイベント（USER_UPDATED、INITIAL_SESSIONなど）
+        logger.log('[Auth] その他のイベント:', event);
+        // セッションがあればそのまま継続、なければクリア
+        if (session) {
+          setSession(session);
+        }
+        // 念のため、isLoadingをfalseにする
+        setIsLoading(false);
       }
     });
 
