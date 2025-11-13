@@ -224,27 +224,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
         setSession(session);
 
-        // 既にユーザーデータがある場合は、バックグラウンドで更新（ローディング表示なし）
+        // 既にユーザーデータがある場合は何もしない（タブ切り替え対策）
         if (user && member) {
-          logger.log('[Auth] 既存データあり、ローディングなしでバックグラウンド更新');
-          setIsLoading(false); // 即座にローディング終了
-
-          // バックグラウンドで更新を試みる（非同期、awaitしない）
-          fetchUserAndMember(session.user.id).then(({ user: userData, member: memberData }) => {
-            if (isMounted && userData && memberData) {
-              logger.log('[Auth] バックグラウンド更新成功');
-              updateUser(userData);
-              updateMember(memberData);
-            }
-          }).catch(err => {
-            logger.warn('[Auth] バックグラウンド更新失敗、既存データを維持:', err);
-            // 既存データを維持（何もしない）
-          });
+          logger.log('[Auth] 既存データあり、データ取得をスキップ');
+          setIsLoading(false);
           return;
         }
 
-        // 初回またはデータがない場合のみローディング表示
-        logger.log('[Auth] 初回データ取得開始');
+        // 初回ログイン時のみデータ取得
+        logger.log('[Auth] 初回ログイン、データ取得開始');
         isProcessingSIGNED_IN = true; // 処理開始フラグをON
         setIsLoading(true);
 
