@@ -3,7 +3,18 @@ import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 
 const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY')!
 
+// CORSヘッダーの定義
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+}
+
 Deno.serve(async (req) => {
+  // プリフライトリクエスト（OPTIONS）に対応
+  if (req.method === 'OPTIONS') {
+    return new Response('ok', { headers: corsHeaders })
+  }
+
   const { to, subject, html } = await req.json()
   const res = await fetch('https://api.resend.com/emails', {
     method: 'POST',
@@ -24,6 +35,9 @@ Deno.serve(async (req) => {
   })
   const data = await res.json()
   return new Response(JSON.stringify(data), {
-    headers: { 'Content-Type': 'application/json' },
+    headers: {
+      'Content-Type': 'application/json',
+      ...corsHeaders,
+    },
   })
 })
