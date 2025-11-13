@@ -46,6 +46,7 @@ export default function Profile() {
 
   // 画像アップロード成功時の処理
   const handleImageUploadSuccess = (newAvatarFilename: string) => {
+    // avatar_filenameが更新されたら、コンポーネントが自動的に新しいURLを生成
     setUser((prev) => (prev ? { ...prev, avatar_filename: newAvatarFilename } : null));
   };
 

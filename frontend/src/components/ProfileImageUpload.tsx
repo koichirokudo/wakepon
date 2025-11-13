@@ -22,33 +22,18 @@ export default function ProfileImageUpload({
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const { handleError, showSuccess } = useErrorHandler();
 
-  // avatar_filenameから署名付きURLを生成
+  // avatar_filenameから公開URLを生成（RLSで保護）
   useEffect(() => {
-    const loadAvatarUrl = async () => {
-      if (!currentAvatarFilename) {
-        setUploadedImageUrl('');
-        return;
-      }
+    if (!currentAvatarFilename) {
+      setUploadedImageUrl('');
+      return;
+    }
 
-      try {
-        const { data, error } = await supabase.storage
-          .from('avatars')
-          .createSignedUrl(currentAvatarFilename, 3600);
+    const { data } = supabase.storage
+      .from('avatars')
+      .getPublicUrl(currentAvatarFilename);
 
-        if (error) {
-          console.error('署名付きURL生成エラー:', error);
-          setUploadedImageUrl('');
-          return;
-        }
-
-        setUploadedImageUrl(data.signedUrl);
-      } catch (err) {
-        console.error('画像URL読み込みエラー:', err);
-        setUploadedImageUrl('');
-      }
-    };
-
-    loadAvatarUrl();
+    setUploadedImageUrl(data.publicUrl);
   }, [currentAvatarFilename]);
 
   const handleAvatarClick = () => {
@@ -80,23 +65,19 @@ export default function ProfileImageUpload({
         return;
       }
 
-      // 署名付きURLを取得（世帯内共有のため、1時間有効）
-      const { data: urlData, error: urlError } = await supabase.storage
+      // 公開URLを取得（RLSで保護）
+      const { data: urlData } = supabase.storage
         .from('avatars')
-        .createSignedUrl(uploadData.path, 3600);
+        .getPublicUrl(uploadData.path);
 
-      if (urlError) {
-        handleError(urlError, '画像URL生成失敗');
-        return;
-      }
+      const publicUrl = urlData.publicUrl;
 
-      const signedUrl = urlData.signedUrl;
-
-      // ユーザー情報を更新（avatar_filenameのみ保存、URLは毎回生成）
+      // ユーザー情報を更新
       const { error: updateError } = await supabase
         .from('users')
         .update({
           avatar_filename: fileName,
+          avatar_url: publicUrl,
         })
         .eq('id', userId);
 
@@ -105,7 +86,7 @@ export default function ProfileImageUpload({
         return;
       }
 
-      setUploadedImageUrl(signedUrl);
+      setUploadedImageUrl(publicUrl);
       onUploadSuccess(fileName);
       showSuccess('プロフィール画像を更新しました');
     } catch (error) {
