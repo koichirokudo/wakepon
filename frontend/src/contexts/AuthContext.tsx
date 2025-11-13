@@ -120,9 +120,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     let isMounted = true;
     let isInitialEvent = true; // 初回イベントかどうかのフラグ
+    let isProcessingSIGNED_IN = false; // SIGNED_IN処理中フラグ
 
     const { data: listener } = supabase.auth.onAuthStateChange(async (event: AuthChangeEvent, session: Session | null) => {
-      logger.log('[Auth] onAuthStateChange:', { event, hasSession: !!session, isMounted, isInitialEvent });
+      logger.log('[Auth] onAuthStateChange:', { event, hasSession: !!session, isMounted, isInitialEvent, isProcessingSIGNED_IN });
 
       if (!isMounted) return;
 
@@ -130,6 +131,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       if (isInitialEvent) {
         logger.log('[Auth] 初回イベントをスキップ:', event);
         isInitialEvent = false;
+        return;
+      }
+
+      // SIGNED_IN処理中の場合は重複イベントをスキップ
+      if (event === 'SIGNED_IN' && isProcessingSIGNED_IN) {
+        logger.log('[Auth] SIGNED_IN処理中のため重複イベントをスキップ');
         return;
       }
 
@@ -141,13 +148,17 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setIsLoading(false);
       } else if (event === 'SIGNED_IN' && session?.user) {
         logger.log('[Auth] SIGNED_IN イベント、データ取得開始');
+        isProcessingSIGNED_IN = true; // 処理開始フラグをON
         setIsLoading(true);
         setSession(session);
 
         try {
           const { user: userData, member: memberData } = await fetchUserAndMember(session.user.id);
 
-          if (!isMounted) return;
+          if (!isMounted) {
+            isProcessingSIGNED_IN = false;
+            return;
+          }
 
           setUser(userData);
           setMember(memberData);
@@ -160,6 +171,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             logger.log('[Auth] SIGNED_IN 処理完了、ローディング終了');
             setIsLoading(false);
           }
+          isProcessingSIGNED_IN = false; // 処理完了フラグをOFF
         }
       } else if (event === 'TOKEN_REFRESHED' && session) {
         logger.log('[Auth] TOKEN_REFRESHED イベント');
