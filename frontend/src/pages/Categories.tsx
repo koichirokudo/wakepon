@@ -12,35 +12,53 @@ export default function Categories() {
   const [categories, setCategories] = useState<Category[]>([]); // 全カテゴリ
   const [enableCategoryIds, setEnableCategoryIds] = useState<string[]>([]); // 使用中カテゴリ
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [errorMessage, setErrorMessage] = useState<string>("");
 
   // 共通エラー処理
   const handleError = (msg: string, error: any) => {
     console.error(`${msg}:`, error?.message ?? error);
+    setErrorMessage(`${msg}: ${error?.message ?? 'エラーが発生しました'}`);
+    setIsLoading(false);
   };
 
   // カテゴリ取得
   const fetchCategories = async () => {
-    if (!member) return;
+    if (!member) {
+      setErrorMessage("世帯情報が見つかりません。プロフィールページから世帯を作成してください。");
+      setIsLoading(false);
+      return;
+    }
 
     setIsLoading(true);
+    setErrorMessage("");
 
-    // 全カテゴリ取得（共通 + カスタム)
-    const { data: catData, error: catError } = await supabase
-      .from('categories')
-      .select();
-    if (catError) return handleError("カテゴリ取得失敗", catError);
+    try {
+      // 全カテゴリ取得（共通 + カスタム)
+      const { data: catData, error: catError } = await supabase
+        .from('categories')
+        .select();
+      if (catError) {
+        handleError("カテゴリ取得失敗", catError);
+        return;
+      }
 
-    setCategories(catData);
+      setCategories(catData || []);
 
-    // 世帯ごとのカテゴリ情報を取得
-    const { data: hcData, error: hcError } = await supabase
-      .from('household_categories')
-      .select('category_id')
-      .eq('household_id', member?.household_id);
-    if (hcError) return handleError("世帯カテゴリ取得失敗", hcError);
+      // 世帯ごとのカテゴリ情報を取得
+      const { data: hcData, error: hcError } = await supabase
+        .from('household_categories')
+        .select('category_id')
+        .eq('household_id', member.household_id);
+      if (hcError) {
+        handleError("世帯カテゴリ取得失敗", hcError);
+        return;
+      }
 
-    setEnableCategoryIds(hcData.map((hc: { category_id: string }) => hc.category_id));
-    setIsLoading(false);
+      setEnableCategoryIds(hcData?.map((hc: { category_id: string }) => hc.category_id) || []);
+      setIsLoading(false);
+    } catch (err) {
+      handleError("予期しないエラー", err);
+    }
   }
 
   useEffect(() => {
@@ -95,6 +113,41 @@ export default function Categories() {
     );
   }
 
+  if (errorMessage) {
+    return (
+      <div className="categories">
+        <Card>
+          <CardHeader>エラー</CardHeader>
+          <CardBody>
+            <div style={{
+              backgroundColor: '#fee',
+              border: '1px solid #fcc',
+              padding: '15px',
+              borderRadius: '4px',
+              color: '#c00'
+            }}>
+              {errorMessage}
+            </div>
+            <button
+              onClick={fetchCategories}
+              style={{
+                marginTop: '15px',
+                padding: '10px 20px',
+                backgroundColor: '#4A90E2',
+                color: 'white',
+                border: 'none',
+                borderRadius: '4px',
+                cursor: 'pointer'
+              }}
+            >
+              再読み込み
+            </button>
+          </CardBody>
+        </Card>
+      </div>
+    );
+  }
+
   return (
     <div className="categories">
       <Card>
@@ -107,10 +160,10 @@ export default function Categories() {
       <Card>
         <CardHeader>カテゴリを選択</CardHeader>
         <CardBody>
-          <SelectCategoryForm 
-            categories={categories} 
-            enableCategoryIds={enableCategoryIds} 
-            onSubmit={handleSelectCategory} 
+          <SelectCategoryForm
+            categories={categories}
+            enableCategoryIds={enableCategoryIds}
+            onSubmit={handleSelectCategory}
           />
         </CardBody>
       </Card>
