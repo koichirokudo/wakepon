@@ -17,19 +17,69 @@ type AuthContextType = {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+// localStorageのキー
+const USER_CACHE_KEY = 'wakepon_user_cache';
+const MEMBER_CACHE_KEY = 'wakepon_member_cache';
+
+// localStorageから復元
+const getCachedUser = (): User | null => {
+  try {
+    const cached = localStorage.getItem(USER_CACHE_KEY);
+    return cached ? JSON.parse(cached) : null;
+  } catch {
+    return null;
+  }
+};
+
+const getCachedMember = (): Member | null => {
+  try {
+    const cached = localStorage.getItem(MEMBER_CACHE_KEY);
+    return cached ? JSON.parse(cached) : null;
+  } catch {
+    return null;
+  }
+};
+
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [session, setSession] = useState<Session | null>(null);
-  const [user, setUser] = useState<User | null>(null);
-  const [member, setMember] = useState<Member | null>(null);
+  // 初期値をlocalStorageから復元
+  const [user, setUser] = useState<User | null>(getCachedUser);
+  const [member, setMember] = useState<Member | null>(getCachedMember);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+
+  // userを更新する関数（localStorageにも保存）
+  const updateUser: React.Dispatch<React.SetStateAction<User | null>> = (action) => {
+    setUser((prev) => {
+      const newUser = typeof action === 'function' ? action(prev) : action;
+      if (newUser) {
+        localStorage.setItem(USER_CACHE_KEY, JSON.stringify(newUser));
+      } else {
+        localStorage.removeItem(USER_CACHE_KEY);
+      }
+      return newUser;
+    });
+  };
+
+  // memberを更新する関数（localStorageにも保存）
+  const updateMember: React.Dispatch<React.SetStateAction<Member | null>> = (action) => {
+    setMember((prev) => {
+      const newMember = typeof action === 'function' ? action(prev) : action;
+      if (newMember) {
+        localStorage.setItem(MEMBER_CACHE_KEY, JSON.stringify(newMember));
+      } else {
+        localStorage.removeItem(MEMBER_CACHE_KEY);
+      }
+      return newMember;
+    });
+  };
 
   const signin = async (email: string) => {
     return await supabase.auth.signInWithOtp({ email });
   };
 
   const signout = async () => {
-    setUser(null);
-    setMember(null);
+    updateUser(null);
+    updateMember(null);
     setSession(null);
     const result = await supabase.auth.signOut();
     setIsLoading(false);
@@ -98,8 +148,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         if (error || !session) {
           logger.log('[Auth] セッションなし、状態をクリア');
           setSession(null);
-          setUser(null);
-          setMember(null);
+          updateUser(null);
+          updateMember(null);
           return;
         }
 
@@ -114,16 +164,16 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             return;
           }
 
-          setUser(userData);
-          setMember(memberData);
+          updateUser(userData);
+          updateMember(memberData);
           logger.log('[Auth] ユーザーとメンバー情報設定完了');
         }
       } catch (err) {
         if (!isMounted) return;
         logger.error("[Auth] エラー:", err);
         setSession(null);
-        setUser(null);
-        setMember(null);
+        updateUser(null);
+        updateMember(null);
       } finally {
         if (isMounted) {
           logger.log('[Auth] 初期化完了、ローディング終了');
@@ -166,8 +216,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       if (event === 'SIGNED_OUT' || !session) {
         logger.log('[Auth] SIGNED_OUT または セッションなし');
         setSession(null);
-        setUser(null);
-        setMember(null);
+        updateUser(null);
+        updateMember(null);
         setIsLoading(false);
       } else if (event === 'SIGNED_IN' && session?.user) {
         logger.log('[Auth] SIGNED_IN イベント検出');
@@ -183,8 +233,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           fetchUserAndMember(session.user.id).then(({ user: userData, member: memberData }) => {
             if (isMounted && userData && memberData) {
               logger.log('[Auth] バックグラウンド更新成功');
-              setUser(userData);
-              setMember(memberData);
+              updateUser(userData);
+              updateMember(memberData);
             }
           }).catch(err => {
             logger.warn('[Auth] バックグラウンド更新失敗、既存データを維持:', err);
@@ -210,13 +260,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           }
 
           logger.log('[Auth] ユーザー状態更新開始');
-          setUser(userData);
-          setMember(memberData);
+          updateUser(userData);
+          updateMember(memberData);
           logger.log('[Auth] ユーザー状態更新完了');
         } catch (err) {
           logger.error("[Auth] 初回データ取得エラー:", err);
-          setUser(null);
-          setMember(null);
+          updateUser(null);
+          updateMember(null);
         } finally {
           if (isMounted) {
             logger.log('[Auth] SIGNED_IN 処理完了、ローディング終了');
@@ -247,7 +297,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ session, user, member, isLoading, signin, signout, setUser }}>
+    <AuthContext.Provider value={{ session, user, member, isLoading, signin, signout, setUser: updateUser }}>
       {children}
     </AuthContext.Provider>
   );
