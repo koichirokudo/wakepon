@@ -38,13 +38,15 @@ export type Settlement = {
 };
 
 // Supabaseクエリ結果の型定義
+type RelationResult<T> = T | T[] | null;
+
 export type ExpenseQueryResult = {
   id: string;
   date: string;
   amount: number;
   memo: string;
-  users: { name: string }[] | null;
-  categories: { id: string; name: string }[] | null;
+  users: RelationResult<{ name: string }>;
+  categories: RelationResult<{ id: string; name: string }>;
 };
 
 export type ExpenseInsertResult = {
@@ -52,7 +54,7 @@ export type ExpenseInsertResult = {
   date: string;
   amount: number;
   memo: string;
-  categories: { id: string; name: string } | { id: string; name: string }[] | null;
+  categories: RelationResult<{ id: string; name: string }>;
 };
 
 export type Category = {

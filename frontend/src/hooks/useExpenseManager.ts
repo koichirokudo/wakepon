@@ -1,7 +1,12 @@
 // src/hooks/useExpenseManager.ts
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '../lib/supabaseClient';
-import type { Expense, ExpenseInput, ExpenseInsertResult } from '../types';
+import type {
+  Expense,
+  ExpenseInput,
+  ExpenseInsertResult,
+  ExpenseQueryResult,
+} from '../types';
 import { useErrorHandler } from '../utils/errorHandler';
 
 type UseExpenseManagerProps = {
@@ -25,6 +30,13 @@ type UseExpenseManagerReturn = {
  * 支出管理のカスタムフック
  * 支出のCRUD操作とキャッシュ管理を担当
  */
+const normalizeRelation = <T,>(value: T | T[] | null | undefined): T | null => {
+  if (Array.isArray(value)) {
+    return value[0] ?? null;
+  }
+  return value ?? null;
+};
+
 export function useExpenseManager({
   userId,
   householdId,
@@ -66,18 +78,22 @@ export function useExpenseManager({
       if (error) {
         handleError(error, '費用の取得に失敗しました');
       } else {
-        const mapped: Expense[] = (data || []).map((item: any) => ({
-          id: item.id,
-          date: item.date,
-          amount: item.amount,
-          memo: item.memo,
-          users: Array.isArray(item.users) && item.users.length > 0
-            ? item.users[0]
-            : null,
-          category: Array.isArray(item.categories) && item.categories.length > 0
-            ? item.categories[0]
-            : { id: '', name: '不明' },
-        }));
+        const mapped: Expense[] = (data || []).map((item: ExpenseQueryResult) => {
+          const user = normalizeRelation(item.users);
+          const category = normalizeRelation(item.categories) ?? {
+            id: '',
+            name: '不明',
+          };
+
+          return {
+            id: item.id,
+            date: item.date,
+            amount: item.amount,
+            memo: item.memo,
+            users: user,
+            category,
+          };
+        });
 
         setExpensesCache((prev) => ({ ...prev, [selectedMonth]: mapped }));
         setExpenses(mapped);
@@ -132,15 +148,18 @@ export function useExpenseManager({
         handleError(error, '支出追加失敗');
       } else if (data) {
         const result = data as ExpenseInsertResult;
+        const category = normalizeRelation(result.categories) ?? {
+          id: '',
+          name: '不明',
+        };
+
         const newExpense: Expense = {
           id: result.id,
           date: result.date,
           amount: result.amount,
           memo: result.memo,
           users: { name: '自分' }, // ユーザー名は後で取得可能
-          category: Array.isArray(result.categories)
-            ? result.categories[0]
-            : result.categories || { id: '', name: '不明' },
+          category,
         };
 
         setExpenses((prev) => {
@@ -193,6 +212,11 @@ export function useExpenseManager({
       } else if (data) {
         const result = data as ExpenseInsertResult;
         setExpenses((prev) => {
+          const category = normalizeRelation(result.categories) ?? {
+            id: '',
+            name: '不明',
+          };
+
           const updated = prev.map((exp) =>
             exp.id === editingExpenseId
               ? {
@@ -200,9 +224,7 @@ export function useExpenseManager({
                   date: result.date,
                   amount: result.amount,
                   memo: result.memo,
-                  category: Array.isArray(result.categories)
-                    ? result.categories[0]
-                    : result.categories || { id: '', name: '不明' },
+                  category,
                 }
               : exp
           );
