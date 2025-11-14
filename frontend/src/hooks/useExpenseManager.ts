@@ -8,6 +8,7 @@ import type {
   ExpenseQueryResult,
 } from '../types';
 import { useErrorHandler } from '../utils/errorHandler';
+import { useAuth } from '../contexts/AuthContext';
 
 type UseExpenseManagerProps = {
   userId?: string;
@@ -48,6 +49,7 @@ export function useExpenseManager({
   const [editingExpenseId, setEditingExpenseId] = useState<string | null>(null);
 
   const { handleError, showSuccess } = useErrorHandler();
+  const { user } = useAuth();
 
   // 月の支出取得（キャッシュを活用）
   useEffect(() => {
@@ -158,7 +160,7 @@ export function useExpenseManager({
           date: result.date,
           amount: result.amount,
           memo: result.memo,
-          users: { name: '自分' }, // ユーザー名は後で取得可能
+          users: user ? { name: user.name } : { name: '不明' },
           category,
         };
 
