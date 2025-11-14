@@ -27,7 +27,7 @@ Deno.serve(async (req) => {
       // - Resendの設定でドメインを追加しておく必要がある
       // - ここでは仮のドメイン（komapepe.xyz）を使用しているが、
       // 実際には適切なドメインを設定しておくこと
-      from: 'wakewake@mail.komapepe.xyz',
+      from: 'wakepon@mail.koichirokudo.info',
       to,
       subject,
       html,
