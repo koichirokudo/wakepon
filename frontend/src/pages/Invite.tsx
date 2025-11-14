@@ -60,7 +60,7 @@ export default function Invite() {
         body: JSON.stringify({
           to: data.email,
           subject: `【わけぽん】${user?.name}さんがあなたを招待しました`,
-          html: `<p>こんにちは！共有家計簿アプリのわけわけです。</p>
+          html: `<p>こんにちは！共有家計簿アプリのわけぽんです。</p>
           <p>あなたを${user?.name}さんがグループに招待しています。以下のリンクから参加してください。</p>
           <p><a href="${appOrigin}/signin?invite_code=${code}">招待リンク</a></p>`
         }),
