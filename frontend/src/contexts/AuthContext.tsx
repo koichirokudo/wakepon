@@ -1,5 +1,5 @@
 // src/contexts/AuthContext.tsx
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
 import { supabase } from '../lib/supabaseClient';
 import type { AuthError, AuthOtpResponse, Session, AuthChangeEvent } from '@supabase/supabase-js';
 import type { Member, User } from '../types';
@@ -47,8 +47,19 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [member, setMember] = useState<Member | null>(getCachedMember);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
+  const userRef = useRef<User | null>(user);
+  const memberRef = useRef<Member | null>(member);
+
+  useEffect(() => {
+    userRef.current = user;
+  }, [user]);
+
+  useEffect(() => {
+    memberRef.current = member;
+  }, [member]);
+
   // userを更新する関数（localStorageにも保存）
-  const updateUser: React.Dispatch<React.SetStateAction<User | null>> = (action) => {
+  const updateUser = useCallback<React.Dispatch<React.SetStateAction<User | null>>>((action) => {
     setUser((prev) => {
       const newUser = typeof action === 'function' ? action(prev) : action;
       if (newUser) {
@@ -58,10 +69,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       }
       return newUser;
     });
-  };
+  }, []);
 
   // memberを更新する関数（localStorageにも保存）
-  const updateMember: React.Dispatch<React.SetStateAction<Member | null>> = (action) => {
+  const updateMember = useCallback<React.Dispatch<React.SetStateAction<Member | null>>>((action) => {
     setMember((prev) => {
       const newMember = typeof action === 'function' ? action(prev) : action;
       if (newMember) {
@@ -71,7 +82,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       }
       return newMember;
     });
-  };
+  }, []);
 
   const signin = async (email: string) => {
     return await supabase.auth.signInWithOtp({ email });
@@ -97,7 +108,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   // ユーザーとメンバーデータを取得する共通関数
-  const fetchUserAndMember = async (userId: string) => {
+  const fetchUserAndMember = useCallback(async (userId: string) => {
     logger.log('[Auth] ユーザーID:', userId);
 
     try {
@@ -106,10 +117,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       // 3秒のタイムアウトを設定（タブ切り替えでは通常スキップされるので、これは念のため）
       const [userRes, memberRes] = await withTimeout(
         Promise.all([
-          supabase.from("users").select().eq("id", userId).single(),
-          supabase.from("household_members").select().eq("user_id", userId).single()
+          supabase.from('users').select().eq('id', userId).single(),
+          supabase.from('household_members').select().eq('user_id', userId).single(),
         ]),
-        3000
+        3000,
       );
 
       logger.log('[Auth] データベースクエリ完了:', {
@@ -125,7 +136,64 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       // タイムアウトやエラーの場合でもnullを返して続行
       return { user: null, member: null };
     }
-  };
+  }, []);
+
+  const isRevalidatingRef = useRef(false);
+
+  const revalidateSession = useCallback(async () => {
+    if (isRevalidatingRef.current) {
+      return;
+    }
+
+    isRevalidatingRef.current = true;
+    let toggledLoading = false;
+
+    const ensureLoading = () => {
+      if (!toggledLoading) {
+        toggledLoading = true;
+        setIsLoading(true);
+      }
+    };
+
+    try {
+      logger.log('[Auth] フォーカス時のセッション再検証開始');
+      const {
+        data: { session: currentSession },
+        error,
+      } = await supabase.auth.getSession();
+
+      if (error || !currentSession) {
+        logger.warn('[Auth] 再検証でセッションを確認できませんでした', { error });
+        ensureLoading();
+        setSession(null);
+        updateUser(null);
+        updateMember(null);
+        return;
+      }
+
+      setSession(currentSession);
+
+      if (currentSession.user && (!userRef.current || !memberRef.current)) {
+        logger.log('[Auth] キャッシュがないためユーザー情報を再取得');
+        ensureLoading();
+        const { user: userData, member: memberData } = await fetchUserAndMember(currentSession.user.id);
+        updateUser(userData);
+        updateMember(memberData);
+      }
+    } catch (error) {
+      logger.error('[Auth] 再検証中にエラーが発生', error);
+      ensureLoading();
+      setSession(null);
+      updateUser(null);
+      updateMember(null);
+    } finally {
+      if (toggledLoading) {
+        setIsLoading(false);
+      }
+      isRevalidatingRef.current = false;
+      logger.log('[Auth] セッション再検証完了');
+    }
+  }, [fetchUserAndMember, updateMember, updateUser]);
 
   // リロード時に getSession を呼ぶ
   useEffect(() => {
@@ -225,7 +293,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setSession(session);
 
         // 既にユーザーデータがある場合は何もしない（タブ切り替え対策）
-        if (user && member) {
+        if (userRef.current && memberRef.current) {
           logger.log('[Auth] 既存データあり、データ取得をスキップ');
           setIsLoading(false);
           return;
@@ -283,6 +351,26 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       listener?.subscription.unsubscribe();
     };
   }, []);
+
+  useEffect(() => {
+    const handleVisibility = () => {
+      if (document.visibilityState === 'visible') {
+        void revalidateSession();
+      }
+    };
+
+    const handleFocus = () => {
+      void revalidateSession();
+    };
+
+    window.addEventListener('focus', handleFocus);
+    document.addEventListener('visibilitychange', handleVisibility);
+
+    return () => {
+      window.removeEventListener('focus', handleFocus);
+      document.removeEventListener('visibilitychange', handleVisibility);
+    };
+  }, [revalidateSession]);
 
   return (
     <AuthContext.Provider value={{ session, user, member, isLoading, signin, signout, setUser: updateUser }}>
