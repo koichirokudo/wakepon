@@ -59,7 +59,7 @@ export default function Invite() {
       const { data: inviteData, error: inviteError } = await supabase.functions.invoke('send-invite', {
         body: JSON.stringify({
           to: data.email,
-          subject: `【わけわけ】${user?.name}さんがあなたを招待しました`,
+          subject: `【わけぽん】${user?.name}さんがあなたを招待しました`,
           html: `<p>こんにちは！共有家計簿アプリのわけわけです。</p>
           <p>あなたを${user?.name}さんがグループに招待しています。以下のリンクから参加してください。</p>
           <p><a href="${appOrigin}/signin?invite_code=${code}">招待リンク</a></p>`
